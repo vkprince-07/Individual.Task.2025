@@ -144,7 +144,7 @@ Each potential assignment date receives a score (0-100) based on:
 **Stress Level Calculation**:
 ```
 Level 0 (Low): 0-1 assignments per day
-Level 1 (Moderate): 2-3 assignments per day  
+Level 1 (Moderate): 2-3 assignments per day
 Level 2 (High): 4-5 assignments per day
 Level 3 (Critical): 6+ assignments per day
 ```
@@ -204,7 +204,7 @@ The system uses St Philip's College brand colors:
 
 ## Credits
 
-**Developed for St Philip's College**  
+**Developed for St Philip's College**
 *Excellence in Education • Student Wellbeing First*
 
 This system demonstrates the power of technology in supporting educational excellence while prioritizing student mental health and academic success.
