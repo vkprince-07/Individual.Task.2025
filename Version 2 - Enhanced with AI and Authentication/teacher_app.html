@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Assignment Stress Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .class-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .class-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .class-selector {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .class-selector:focus {
+            outline: none;
+            border-color: #e53e3e;
+        }
+
+        .user-badge {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100());
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 28px;
+            height: 28px;
+            background: #e53e3e;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+        }
+
+        .btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .suggestions-panel {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid #e53e3e;
+            display: none;
+        }
+
+        .suggestions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e53e3e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .suggestion-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .suggestion-icon {
+            font-size: 1.2rem;
+            margin-top: 0.1rem;
+        }
+
+        .suggestion-content {
+            flex: 1;
+        }
+
+        .suggestion-text {
+            font-size: 0.9rem;
+            color: #2d3748;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .suggestion-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: #c6f6d5; color: #276749; }
+        .badge-warning { background: #fef7de; color: #d69e2e; }
+        .badge-danger { background: #fed7d7; color: #c53030; }
+        .badge-info { background: #bee3f8; color: #2b6cb0; }
+
+        .calendar-section {
+            grid-column: 1 / -1;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .month-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .month-btn:hover {
+            background: #c53030;
+        }
+
+        .month-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-header {
+            font-weight: 600;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            min-height: 70px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            border-color: #e53e3e;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(229, 62, 62, 0.2);
+        }
+
+        .stress-0 { background: #c6f6d5; color: #276749; }
+        .stress-1 { background: #fef7de; color: #d69e2e; }
+        .stress-2 { background: #fed7d7; color: #c53030; }
+        .stress-3 { background: #fbb6ce; color: #97266d; }
+
+        .assignment-count {
+            font-size: 0.7rem;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .stats-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-card.danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .insights-section {
+            grid-column: 1 / -1;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 6px solid #e53e3e;
+        }
+
+        .insights-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 3px solid #667eea;
+        }
+
+        .insight-card.warning {
+            border-left-color: #d69e2e;
+        }
+
+        .insight-card.danger {
+            border-left-color: #e53e3e;
+        }
+
+        .insight-card.success {
+            border-left-color: #38a169;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .insight-text {
+            color: #718096;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-recommendation {
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.2s;
+        }
+
+        .close:hover {
+            color: #e53e3e;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .class-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .class-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #667eea;
+        }
+
+        .class-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+            letter-spacing: 1px;
+        }
+
+        .class-info {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .delete-class-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-class-btn:hover {
+            background: #c53030;
+        }
+
+        .add-class-form {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .copy-btn {
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: #2f855a;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .legend {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">👩‍🏫</div>
+                <span>Teacher Dashboard</span>
+            </div>
+            <nav class="nav-links">
+                <button class="class-btn" onclick="openClassModal()">📚 My Classes</button>
+                <select class="class-selector" id="class-selector">
+                    <option value="all">All My Classes</option>
+                </select>
+                <span class="user-badge" id="user-badge">Teacher</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Teacher Dashboard</h1>
+            <p>Get intelligent suggestions for assignment scheduling and visualize student workload patterns. Make data-driven decisions to prevent academic burnout and optimize learning outcomes.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2 class="card-title">
+                    <div class="card-icon">🤖</div>
+                    Smart Assignment Scheduler
+                </h2>
+
+                <form id="scheduler-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="subject">Subject</label>
+                            <input class="form-input" type="text" id="subject" placeholder="Mathematics" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="assignment">Assignment</label>
+                            <input class="form-input" type="text" id="assignment" placeholder="Unit Test" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="desired-date">Desired Date</label>
+                            <input class="form-input" type="date" id="desired-date" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-full">Get AI Suggestions</button>
+                </form>
+
+                <div class="suggestions-panel" id="suggestions-panel">
+                    <div class="suggestions-title">
+                        🤖 AI Scheduling Recommendations
+                    </div>
+                    <div id="suggestions-container"></div>
+                </div>
+            </div>
+
+            <div class="card stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-assignments">0</div>
+                    <div class="stat-label">Total Assignments</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-number" id="stress-days">0</div>
+                    <div class="stat-label">High Stress Days</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-number" id="weekend-assignments">0</div>
+                    <div class="stat-label">Weekend Assignments</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="balance-score">Good</div>
+                    <div class="stat-label">Balance Score</div>
+                </div>
+            </div>
+
+            <div class="card calendar-section">
+                <h2 class="card-title">
+                    <div class="card-icon">📅</div>
+                    Student Workload Heatmap
+                </h2>
+
+                <div class="month-nav">
+                    <button class="month-btn" onclick="changeMonth(-1)">← Previous</button>
+                    <div class="month-title" id="current-month">October 2024</div>
+                    <button class="month-btn" onclick="changeMonth(1)">Next →</button>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="calendar-header">Sun</div>
+                    <div class="calendar-header">Mon</div>
+                    <div class="calendar-header">Tue</div>
+                    <div class="calendar-header">Wed</div>
+                    <div class="calendar-header">Thu</div>
+                    <div class="calendar-header">Fri</div>
+                    <div class="calendar-header">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color stress-0"></div>
+                        <span>Low (0-1 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-1"></div>
+                        <span>Moderate (2-3 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-2"></div>
+                        <span>High (4-5 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-3"></div>
+                        <span>Critical (6+ assignments)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h2 class="insights-title">
+                    🧠 AI Workload Analysis
+                </h2>
+                <div class="insights-grid" id="insights-container">
+                    <div class="empty-state">
+                        <div class="empty-icon">🤖</div>
+                        <h3>No student data available</h3>
+                        <p>Students need to input their assignments to see AI insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Details Modal -->
+    <div id="day-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Assignment Details</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Class Management Modal -->
+    <div id="class-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📚 My Class Codes</h3>
+                <span class="close" onclick="closeClassModal()">&times;</span>
+            </div>
+            <div class="add-class-form">
+                <h4 style="margin-bottom: 1rem; color: #1a202c;">Generate New Class Code</h4>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input class="form-input" type="text" id="new-class-name" placeholder="e.g., 10A Mathematics" style="flex: 1;">
+                    <button class="btn" onclick="generateClassCode()">Generate</button>
+                </div>
+            </div>
+            <div class="class-list" id="class-list">
+                <div class="empty-state">
+                    <div class="empty-icon">🎓</div>
+                    <p>No classes yet. Generate your first class code!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const session = localStorage.getItem('user-session');
+            if (!session) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            const userData = JSON.parse(session);
+            if (userData.role !== 'teacher') {
+                window.location.href = 'index.html';
+                return false;
+            }
+            // Display username
+            document.getElementById('user-badge').textContent = userData.username;
+            return true;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user-session');
+                window.location.href = 'index.html';
+            }
+        }
+
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let studentAssignments = JSON.parse(localStorage.getItem('student-assignments')) || [];
+        let selectedClass = 'all';
+        let teacherClasses = JSON.parse(localStorage.getItem('teacher-classes')) || [];
+
+        // Helper function to format date without timezone issues
+        function formatDateLocal(year, month, day) {
+            const y = year.toString();
+            const m = (month + 1).toString().padStart(2, '0');
+            const d = day.toString().padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Helper function to convert Date object to YYYY-MM-DD without timezone issues
+        function dateToLocalString(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const day = date.getDate();
+            return formatDateLocal(year, month, day);
+        }
+
+        // Helper function to parse date string to local Date object (avoids UTC interpretation)
+        function parseLocalDate(dateString) {
+            if (!dateString) return null;
+            const [year, month, day] = dateString.split('-').map(Number);
+            // Create date using local timezone (month is 0-indexed)
+            return new Date(year, month - 1, day);
+        }
+
+        // Helper function to add days to a date string
+        function addDays(dateString, days) {
+            const date = parseLocalDate(dateString);
+            if (!date) return null;
+            date.setDate(date.getDate() + days);
+            return dateToLocalString(date);
+        }
+
+        // Helper function to get day of week from date string (0=Sunday, 6=Saturday)
+        function getDayOfWeek(dateString) {
+            const date = parseLocalDate(dateString);
+            return date ? date.getDay() : null;
+        }
+
+        // Helper function to filter assignments by teacher's class codes
+        function getFilteredAssignments() {
+            // Get list of teacher's class codes
+            const teacherClassCodes = teacherClasses.map(tc => tc.code);
+
+            if (selectedClass === 'all') {
+                // Show only assignments that match ANY of the teacher's class codes
+                return studentAssignments.filter(a => teacherClassCodes.includes(a.classCode));
+            } else {
+                // Show only assignments for the selected class code
+                return studentAssignments.filter(a => a.classCode === selectedClass);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) return;
+
+            setMinDate();
+            loadTeacherClasses();
+            renderAll();
+
+            // Auto-refresh data every 30 seconds (reduced frequency to avoid visual glitches)
+            setInterval(() => {
+                const newAssignments = JSON.parse(localStorage.getItem('student-assignments')) || [];
+                // Only re-render if data actually changed
+                if (JSON.stringify(newAssignments) !== JSON.stringify(studentAssignments)) {
+                    studentAssignments = newAssignments;
+                    renderAll();
+                }
+            }, 30000);
+
+            // Class selector change
+            document.getElementById('class-selector').addEventListener('change', function(e) {
+                selectedClass = e.target.value;
+                renderAll();
+            });
+        });
+
+        // Class Management Functions
+        function loadTeacherClasses() {
+            teacherClasses = JSON.parse(localStorage.getItem('teacher-classes')) || [];
+            updateClassSelector();
+            renderClassList();
+        }
+
+        function updateClassSelector() {
+            const selector = document.getElementById('class-selector');
+            selector.innerHTML = '<option value="all">All My Classes</option>';
+
+            teacherClasses.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.code;
+                option.textContent = cls.name;
+                selector.appendChild(option);
+            });
+        }
+
+        function generateClassCode() {
+            const className = document.getElementById('new-class-name').value.trim();
+            if (!className) {
+                alert('Please enter a class name');
+                return;
+            }
+
+            // Generate unique code: CLASSNAME-RANDOM
+            const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const classCode = `${className.replace(/\s+/g, '-').toUpperCase()}-${randomPart}`;
+
+            const newClass = {
+                code: classCode,
+                name: className,
+                createdAt: new Date().toISOString()
+            };
+
+            teacherClasses.push(newClass);
+            localStorage.setItem('teacher-classes', JSON.stringify(teacherClasses));
+
+            document.getElementById('new-class-name').value = '';
+            loadTeacherClasses();
+        }
+
+        function renderClassList() {
+            const container = document.getElementById('class-list');
+
+            if (teacherClasses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎓</div>
+                        <p>No classes yet. Generate your first class code!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = teacherClasses.map(cls => `
+                <div class="class-item">
+                    <div>
+                        <div class="class-code">${cls.code}</div>
+                        <div class="class-info">${cls.name}</div>
+                    </div>
+                    <div>
+                        <button class="copy-btn" onclick="copyClassCode('${cls.code}')">📋 Copy</button>
+                        <button class="delete-class-btn" onclick="deleteClass('${cls.code}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function copyClassCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert(`Class code "${code}" copied to clipboard!`);
+            }).catch(() => {
+                // Fallback for browsers that don't support clipboard API
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert(`Class code "${code}" copied to clipboard!`);
+            });
+        }
+
+        function deleteClass(code) {
+            if (confirm(`Are you sure you want to delete class code "${code}"?`)) {
+                teacherClasses = teacherClasses.filter(cls => cls.code !== code);
+                localStorage.setItem('teacher-classes', JSON.stringify(teacherClasses));
+                loadTeacherClasses();
+
+                // Reset selector if deleted class was selected
+                if (selectedClass === code) {
+                    selectedClass = 'all';
+                    document.getElementById('class-selector').value = 'all';
+                    renderAll();
+                }
+            }
+        }
+
+        function openClassModal() {
+            document.getElementById('class-modal').style.display = 'block';
+        }
+
+        function closeClassModal() {
+            document.getElementById('class-modal').style.display = 'none';
+        }
+
+        function setMinDate() {
+            document.getElementById('desired-date').min = new Date().toISOString().split('T')[0];
+        }
+
+        document.getElementById('scheduler-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const subject = document.getElementById('subject').value.trim();
+            const assignment = document.getElementById('assignment').value.trim();
+            const desiredDate = document.getElementById('desired-date').value;
+
+            generateSuggestions(subject, assignment, desiredDate);
+        });
+
+        function generateSuggestions(subject, assignment, desiredDate) {
+            const suggestions = [];
+            // Use the date string directly from the input (already in YYYY-MM-DD format)
+            const dateStr = desiredDate;
+            // Create date object using local timezone
+            const targetDate = parseLocalDate(desiredDate);
+
+            // Filter by teacher's class codes
+            let filteredAssignments = getFilteredAssignments();
+
+            // Check assignments on target date
+            const assignmentsOnDate = filteredAssignments.filter(a => a.dueDate === dateStr);
+            const stressLevel = getStressLevel(assignmentsOnDate.length);
+
+            // Calculate week context - compare date strings instead of Date objects
+            const weekStart = new Date(targetDate);
+            weekStart.setDate(targetDate.getDate() - targetDate.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 7);
+
+            const weekStartStr = dateToLocalString(weekStart);
+            const weekEndStr = dateToLocalString(weekEnd);
+
+            const weekAssignments = filteredAssignments.filter(a => {
+                return a.dueDate >= weekStartStr && a.dueDate < weekEndStr;
+            });
+
+            // Main recommendation with context
+            const context = assignmentsOnDate.length > 0 ?
+                assignmentsOnDate.map(a => `${a.subject}: ${a.assignment}`).join(', ') : 'No assignments';
+
+            if (stressLevel >= 3) {
+                suggestions.push({
+                    type: 'danger',
+                    icon: '🚨',
+                    text: `CRITICAL: ${assignmentsOnDate.length} assignments on ${targetDate.toLocaleDateString()} (${context}). This exceeds recommended daily capacity and significantly impacts learning outcomes.`,
+                    badge: 'Critical Risk'
+                });
+            } else if (stressLevel >= 2) {
+                suggestions.push({
+                    type: 'warning',
+                    icon: '⚠️',
+                    text: `HIGH STRESS: ${assignmentsOnDate.length} assignments on ${targetDate.toLocaleDateString()} (${context}). Studies show 25% performance drop at this level.`,
+                    badge: 'High Risk'
+                });
+            } else if (stressLevel === 1) {
+                suggestions.push({
+                    type: 'info',
+                    icon: 'ℹ️',
+                    text: `Moderate workload on ${targetDate.toLocaleDateString()} with ${assignmentsOnDate.length === 0 ? 'no other' : assignmentsOnDate.length} assignments. This is manageable for most students.`,
+                    badge: 'Moderate'
+                });
+            } else {
+                suggestions.push({
+                    type: 'success',
+                    icon: '✅',
+                    text: `Excellent choice! ${targetDate.toLocaleDateString()} has optimal workload with no competing assignments. Students can focus fully on your ${assignment}.`,
+                    badge: 'Optimal'
+                });
+            }
+
+            // Weekly workload analysis
+            if (weekAssignments.length >= 10) {
+                suggestions.push({
+                    type: 'danger',
+                    icon: '📊',
+                    text: `Week overload: ${weekAssignments.length} assignments scheduled for the week of ${weekStart.toLocaleDateString()}. This exceeds the recommended 8-assignment weekly maximum.`,
+                    badge: 'Weekly Overload'
+                });
+            } else if (weekAssignments.length >= 6) {
+                suggestions.push({
+                    type: 'warning',
+                    icon: '📈',
+                    text: `Heavy week: ${weekAssignments.length} assignments in the week of ${weekStart.toLocaleDateString()}. Monitor student stress levels closely.`,
+                    badge: 'Heavy Week'
+                });
+            }
+
+            // Weekend and holiday detection
+            const dayOfWeek = targetDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                const weekendImpact = dayOfWeek === 0 ? 'Sunday assignments affect weekend family time' : 'Saturday assignments disrupt recreational activities';
+                suggestions.push({
+                    type: 'warning',
+                    icon: '🏖️',
+                    text: `Weekend scheduling detected. ${weekendImpact}. Research indicates 35-40% lower completion rates and increased family stress.`,
+                    badge: 'Weekend Alert'
+                });
+            }
+
+            // Find optimal alternatives with AI scoring
+            if (stressLevel >= 1) {
+                const alternatives = findOptimalAlternatives(targetDate, subject, assignment, filteredAssignments);
+                if (alternatives.length > 0) {
+                    alternatives.slice(0, 3).forEach((alt, index) => {
+                        const priority = index === 0 ? 'BEST' : index === 1 ? 'GOOD' : 'ALTERNATIVE';
+                        suggestions.push({
+                            type: 'success',
+                            icon: index === 0 ? '⭐' : '💡',
+                            text: `${priority}: ${alt.date.toLocaleDateString()} (${alt.dayName}) - Score: ${alt.score}/100. ${alt.reason}`,
+                            badge: `AI Suggestion ${index + 1}`
+                        });
+                    });
+                }
+            }
+
+            displaySuggestions(suggestions);
+        }
+
+        function findOptimalAlternatives(targetDate, subject, assignment, assignments) {
+            const alternatives = [];
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            // Get today's date as string for comparison
+            const today = new Date();
+            const todayStr = dateToLocalString(today);
+            const targetDateStr = dateToLocalString(targetDate);
+
+            // Check 3 weeks forward and 1 week back
+            for (let i = -7; i <= 21; i++) {
+                if (i === 0) continue;
+
+                // Use helper to add days to date string
+                const altDateStr = addDays(targetDateStr, i);
+                if (!altDateStr) continue;
+
+                // Skip past dates - compare date strings
+                if (altDateStr < todayStr) continue;
+
+                // Parse for scoring (calculateDateScore expects Date object currently)
+                const altDate = parseLocalDate(altDateStr);
+                if (!altDate) continue;
+
+                const score = calculateDateScore(altDate, subject, assignment, assignments);
+                if (score > 60) { // Only suggest good alternatives
+                    alternatives.push({
+                        date: altDate,
+                        score: score,
+                        dayName: dayNames[altDate.getDay()],
+                        reason: getScoreReason(altDate, score, assignments)
+                    });
+                }
+            }
+
+            return alternatives
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 5);
+        }
+
+        function calculateDateScore(date, subject, assignment, assignments) {
+            let score = 100;
+            const dateStr = dateToLocalString(date);
+            const assignmentsOnDate = assignments.filter(a => a.dueDate === dateStr);
+
+            // Penalty for existing assignments
+            score -= assignmentsOnDate.length * 15;
+
+            // Weekend penalty
+            if (date.getDay() === 0 || date.getDay() === 6) score -= 30;
+
+            // Friday penalty (lighter)
+            if (date.getDay() === 5) score -= 10;
+
+            // Monday penalty (students often have weekend assignments due)
+            if (date.getDay() === 1) score -= 5;
+
+            // Weekly load penalty - compare date strings
+            const weekStart = new Date(date);
+            weekStart.setDate(date.getDate() - date.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 7);
+
+            const weekStartStr = dateToLocalString(weekStart);
+            const weekEndStr = dateToLocalString(weekEnd);
+
+            const weekAssignments = assignments.filter(a => {
+                return a.dueDate >= weekStartStr && a.dueDate < weekEndStr;
+            });
+            if (weekAssignments.length > 8) score -= 20;
+            else if (weekAssignments.length > 6) score -= 10;
+
+            // Subject clustering penalty - check for same subject within 3 days
+            const currentDateStr = dateToLocalString(date);
+            const subjectNearby = assignments.filter(a => {
+                if (a.subject.toLowerCase() !== subject.toLowerCase()) return false;
+                if (a.dueDate === currentDateStr) return false;
+
+                // Parse both dates using local timezone
+                const date1 = parseLocalDate(a.dueDate);
+                const date2 = parseLocalDate(currentDateStr);
+                if (!date1 || !date2) return false;
+
+                const daysDiff = Math.abs((date2 - date1) / (1000 * 60 * 60 * 24));
+                return daysDiff <= 3 && daysDiff > 0;
+            });
+            score -= subjectNearby.length * 8;
+
+            return Math.max(0, Math.round(score));
+        }
+
+        function getScoreReason(date, score, assignments) {
+            const reasons = [];
+            const dateStr = dateToLocalString(date);
+            const assignmentsOnDate = assignments.filter(a => a.dueDate === dateStr);
+
+            if (assignmentsOnDate.length === 0) reasons.push('No competing assignments');
+            else if (assignmentsOnDate.length === 1) reasons.push('Only 1 other assignment');
+
+            if (date.getDay() >= 2 && date.getDay() <= 4) reasons.push('Mid-week timing');
+
+            const weekStart = new Date(date);
+            weekStart.setDate(date.getDate() - date.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 7);
+
+            const weekStartStr = dateToLocalString(weekStart);
+            const weekEndStr = dateToLocalString(weekEnd);
+
+            const weekAssignments = assignments.filter(a => {
+                return a.dueDate >= weekStartStr && a.dueDate < weekEndStr;
+            });
+
+            if (weekAssignments.length <= 4) reasons.push('Light week');
+
+            return reasons.length > 0 ? reasons.join(', ') : 'Good scheduling option';
+        }
+
+        function displaySuggestions(suggestions) {
+            const panel = document.getElementById('suggestions-panel');
+            const container = document.getElementById('suggestions-container');
+
+            container.innerHTML = suggestions.map(suggestion => `
+                <div class="suggestion-item">
+                    <div class="suggestion-icon">${suggestion.icon}</div>
+                    <div class="suggestion-content">
+                        <div class="suggestion-text">${suggestion.text}</div>
+                        <div class="suggestion-badge badge-${suggestion.type}">${suggestion.badge}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            panel.style.display = 'block';
+        }
+
+        function renderAll() {
+            updateStats();
+            renderCalendar();
+            generateInsights();
+        }
+
+        function updateStats() {
+            // Filter by teacher's class codes
+            let filteredAssignments = getFilteredAssignments();
+
+            const total = filteredAssignments.length;
+
+            // Count stress days - parse dates locally to check month/year
+            const assignmentsByDay = {};
+            filteredAssignments.forEach(a => {
+                const date = parseLocalDate(a.dueDate);
+                if (date && date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+                    assignmentsByDay[a.dueDate] = (assignmentsByDay[a.dueDate] || 0) + 1;
+                }
+            });
+
+            const stressDays = Object.values(assignmentsByDay).filter(count => count >= 4).length;
+
+            // Weekend assignments - use helper function
+            const weekendCount = filteredAssignments.filter(a => {
+                const day = getDayOfWeek(a.dueDate);
+                return day === 0 || day === 6;
+            }).length;
+
+            // Balance score
+            const dailyLoads = Object.values(assignmentsByDay);
+            const avgLoad = dailyLoads.length > 0 ? dailyLoads.reduce((a, b) => a + b, 0) / dailyLoads.length : 0;
+            let balanceScore = avgLoad <= 2 ? 'Excellent' : avgLoad <= 3 ? 'Good' : avgLoad <= 4 ? 'Fair' : 'Poor';
+
+            document.getElementById('total-assignments').textContent = total;
+            document.getElementById('stress-days').textContent = stressDays;
+            document.getElementById('weekend-assignments').textContent = weekendCount;
+            document.getElementById('balance-score').textContent = balanceScore;
+        }
+
+        function renderCalendar() {
+            // Filter by teacher's class codes
+            let filteredAssignments = getFilteredAssignments();
+
+            const grid = document.getElementById('calendar-grid');
+            const monthTitle = document.getElementById('current-month');
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            monthTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Clear existing days
+            const existingDays = grid.querySelectorAll('.calendar-day');
+            existingDays.forEach(day => day.remove());
+
+            // Add empty cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            // Add days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+
+                const date = new Date(currentYear, currentMonth, day);
+                const dateStr = formatDateLocal(currentYear, currentMonth, day);
+
+                // Ensure we're comparing exact date strings
+                const assignmentsOnDay = filteredAssignments.filter(a => {
+                    // Normalize both date strings to ensure exact match
+                    const assignmentDate = a.dueDate ? a.dueDate.trim() : '';
+                    return assignmentDate === dateStr;
+                });
+
+                const stressLevel = getStressLevel(assignmentsOnDay.length);
+
+                dayElement.classList.add(`stress-${stressLevel}`);
+                dayElement.innerHTML = `
+                    <div>${day}</div>
+                    <div class="assignment-count">${assignmentsOnDay.length}</div>
+                `;
+
+                dayElement.addEventListener('click', () => showDayDetails(date, assignmentsOnDay));
+                grid.appendChild(dayElement);
+            }
+        }
+
+        function getStressLevel(count) {
+            if (count <= 1) return 0;
+            if (count <= 3) return 1;
+            if (count <= 5) return 2;
+            return 3;
+        }
+
+        function showDayDetails(date, assignments) {
+            const modal = document.getElementById('day-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            title.textContent = `${date.toLocaleDateString()} - ${assignments.length} Assignment(s)`;
+
+            if (assignments.length === 0) {
+                body.innerHTML = '<p style="color: #718096;">No assignments due on this date.</p>';
+            } else {
+                const stressLevel = getStressLevel(assignments.length);
+                const stressLabels = ['Low Stress', 'Moderate Stress', 'High Stress', 'Critical Stress'];
+                const stressColors = ['#38a169', '#d69e2e', '#e53e3e', '#97266d'];
+
+                body.innerHTML = `
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                        <strong>Stress Level: </strong>
+                        <span style="color: ${stressColors[stressLevel]}; font-weight: 600;">
+                            ${stressLabels[stressLevel]}
+                        </span>
+                    </div>
+                    ${assignments.map(a => `
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid #667eea;">
+                            <strong>${a.subject}</strong>: ${a.assignment}
+                            ${a.description ? `<br><small style="color: #718096;">${a.description}</small>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function generateInsights() {
+            // Filter by teacher's class codes
+            let filteredAssignments = getFilteredAssignments();
+
+            const container = document.getElementById('insights-container');
+
+            if (filteredAssignments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🤖</div>
+                        <h3>No student data available</h3>
+                        <p>Students need to input their assignments to see AI insights.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const insights = [];
+
+            // High stress analysis
+            const assignmentsByDay = {};
+            filteredAssignments.forEach(a => {
+                assignmentsByDay[a.dueDate] = (assignmentsByDay[a.dueDate] || 0) + 1;
+            });
+
+            const criticalDays = Object.entries(assignmentsByDay)
+                .filter(([date, count]) => count >= 4).length;
+
+            if (criticalDays > 0) {
+                insights.push({
+                    type: 'danger',
+                    title: 'Critical Workload Alert',
+                    text: `${criticalDays} days have 4+ simultaneous assignments. Research shows this reduces performance by 35% and increases stress significantly.`,
+                    recommendation: 'Redistribute assignments to prevent academic overload and improve outcomes.'
+                });
+            }
+
+            // Subject balance
+            const subjectCounts = {};
+            filteredAssignments.forEach(a => {
+                subjectCounts[a.subject] = (subjectCounts[a.subject] || 0) + 1;
+            });
+
+            const subjects = Object.entries(subjectCounts).sort(([,a], [,b]) => b - a);
+            if (subjects.length > 1 && subjects[0][1] > subjects[1][1] * 1.5) {
+                insights.push({
+                    type: 'warning',
+                    title: 'Subject Workload Imbalance',
+                    text: `${subjects[0][0]} accounts for ${Math.round(subjects[0][1]/filteredAssignments.length*100)}% of total assignments, creating uneven academic pressure.`,
+                    recommendation: 'Consider coordinating with other teachers to balance subject loads.'
+                });
+            }
+
+            // Weekend assignments - use helper function
+            const weekendCount = filteredAssignments.filter(a => {
+                const day = getDayOfWeek(a.dueDate);
+                return day === 0 || day === 6;
+            }).length;
+
+            if (weekendCount > 0) {
+                insights.push({
+                    type: 'warning',
+                    title: 'Work-Life Balance Impact',
+                    text: `${weekendCount} assignments (${Math.round(weekendCount/filteredAssignments.length*100)}%) due on weekends affect family time and student wellbeing.`,
+                    recommendation: 'Move weekend assignments to weekdays to support better work-life balance.'
+                });
+            }
+
+            // Positive insights
+            if (insights.length === 0) {
+                insights.push({
+                    type: 'success',
+                    title: 'Excellent Workload Management',
+                    text: 'Current assignment distribution shows thoughtful planning and consideration for student wellbeing.',
+                    recommendation: 'Continue current practices. This balanced approach optimizes learning outcomes.'
+                });
+            }
+
+            container.innerHTML = insights.map(insight => `
+                <div class="insight-card ${insight.type}">
+                    <div class="insight-title">${insight.title}</div>
+                    <div class="insight-text">${insight.text}</div>
+                    <div class="insight-recommendation">💡 ${insight.recommendation}</div>
+                </div>
+            `).join('');
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderAll();
+        }
+
+        function closeModal() {
+            document.getElementById('day-modal').style.display = 'none';
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            const dayModal = document.getElementById('day-modal');
+            const classModal = document.getElementById('class-modal');
+
+            if (event.target === dayModal) {
+                dayModal.style.display = 'none';
+            }
+            if (event.target === classModal) {
+                classModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

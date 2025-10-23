@@ -1,0 +1,162 @@
+graph TB
+    Start([Date Operations Needed]) --> Problem[["THE PROBLEM:<br/>Central Australian Time<br/>UTC+9:30 (Standard)<br/>UTC+10:30 (Daylight)"]]
+
+    Problem --> OldWay[["❌ OLD WAY (Broken):<br/>new Date('2024-10-17')<br/>→ Interprets as UTC midnight<br/>→ Converts to local time<br/>→ Shows 2024-10-18 ⚠️"]]
+
+    OldWay --> Solution[["✅ SOLUTION:<br/>Use helper functions<br/>that work in LOCAL timezone"]]
+
+    Solution --> HelperFunctions{Which Helper<br/>Function?}
+
+    %% parseLocalDate Flow
+    HelperFunctions -->|Parse string to Date| ParseLocal[["parseLocalDate(dateString)<br/>Input: '2024-10-17'"]]
+
+    ParseLocal --> SplitString[["SPLIT string by '-'<br/>Result: ['2024', '10', '17']"]]
+
+    SplitString --> ConvertNumbers[["MAP to numbers:<br/>[2024, 10, 17]"]]
+
+    ConvertNumbers --> Extract[["EXTRACT components:<br/>year = 2024<br/>month = 10<br/>day = 17"]]
+
+    Extract --> CreateLocal[["CREATE Date in LOCAL timezone:<br/>new Date(year, month-1, day)<br/>Note: month-1 because<br/>JS months are 0-indexed"]]
+
+    CreateLocal --> ReturnDate[["RETURN Date object:<br/>2024-10-17 00:00:00<br/>in LOCAL timezone ✓"]]
+
+    ReturnDate --> UseCase1
+
+    %% dateToLocalString Flow
+    HelperFunctions -->|Convert Date to string| DateToString[["dateToLocalString(date)<br/>Input: Date object"]]
+
+    DateToString --> GetComponents[["GET local components:<br/>year = date.getFullYear()<br/>month = date.getMonth()<br/>day = date.getDate()"]]
+
+    GetComponents --> CallFormat[["CALL formatDateLocal(<br/>  year, month, day<br/>)"]]
+
+    CallFormat --> UseCase2
+
+    %% formatDateLocal Flow
+    HelperFunctions -->|Format components| FormatLocal[["formatDateLocal(year, month, day)<br/>Input: numbers"]]
+
+    FormatLocal --> ConvertStrings[["CONVERT to strings:<br/>y = year.toString()<br/>m = (month+1).toString()<br/>d = day.toString()"]]
+
+    ConvertStrings --> PadZeros[["PAD with zeros:<br/>m = m.padStart(2, '0')<br/>d = d.padStart(2, '0')"]]
+
+    PadZeros --> BuildString[["BUILD string:<br/>`${y}-${m}-${d}`"]]
+
+    BuildString --> ReturnString[["RETURN string:<br/>'2024-10-17' ✓"]]
+
+    ReturnString --> UseCase2
+
+    %% addDays Flow
+    HelperFunctions -->|Add days to date| AddDays[["addDays(dateString, days)<br/>Input: '2024-10-17', 7"]]
+
+    AddDays --> ParseInput[["CALL parseLocalDate(<br/>  dateString<br/>)"]]
+
+    ParseInput --> CheckNull1{Date valid?}
+
+    CheckNull1 -->|No| ReturnNull1[RETURN null]
+    CheckNull1 -->|Yes| AddDaysCalc[["date.setDate(<br/>  date.getDate() + days<br/>)"]]
+
+    AddDaysCalc --> ConvertBack1[["CALL dateToLocalString(<br/>  date<br/>)"]]
+
+    ConvertBack1 --> ReturnNew[["RETURN new date string:<br/>'2024-10-24' ✓"]]
+
+    ReturnNew --> UseCase3
+
+    %% getDayOfWeek Flow
+    HelperFunctions -->|Get day of week| GetDay[["getDayOfWeek(dateString)<br/>Input: '2024-10-17'"]]
+
+    GetDay --> ParseInput2[["CALL parseLocalDate(<br/>  dateString<br/>)"]]
+
+    ParseInput2 --> CheckNull2{Date valid?}
+
+    CheckNull2 -->|No| ReturnNull2[RETURN null]
+    CheckNull2 -->|Yes| GetDayNum[["CALL date.getDay()<br/>Returns: 0-6<br/>(0=Sunday, 6=Saturday)"]]
+
+    GetDayNum --> ReturnDay[["RETURN day number:<br/>4 (Thursday) ✓"]]
+
+    ReturnDay --> UseCase4
+
+    %% Use Cases
+    UseCase1[["USE CASE 1:<br/>Student enters due date<br/>in form"]]
+    UseCase1 --> UC1Input[["Form input value:<br/>'2024-10-17'"]]
+    UC1Input --> UC1Parse[["CALL parseLocalDate()<br/>to create Date object"]]
+    UC1Parse --> UC1Calc[["Calculate days until due:<br/>Compare with today"]]
+    UC1Calc --> UC1Display[["Display badge:<br/>'3 days left' ✓"]]
+
+    UseCase2[["USE CASE 2:<br/>Render calendar day"]]
+    UseCase2 --> UC2Loop[["Loop through month days:<br/>day = 1 to 31"]]
+    UC2Loop --> UC2Format[["CALL formatDateLocal(<br/>  year, month, day<br/>)"]]
+    UC2Format --> UC2Compare[["Compare with assignment dates:<br/>'2024-10-17' === '2024-10-17' ✓"]]
+    UC2Compare --> UC2Display[["Display on correct day<br/>No date shift! ✓"]]
+
+    UseCase3[["USE CASE 3:<br/>Find alternative dates<br/>for AI suggestions"]]
+    UseCase3 --> UC3Target[["Target date:<br/>'2024-10-17'"]]
+    UC3Target --> UC3Loop[["Loop: i = -7 to +21"]]
+    UC3Loop --> UC3Add[["CALL addDays(<br/>  '2024-10-17', i<br/>)"]]
+    UC3Add --> UC3Result[["Get alternative:<br/>'2024-10-24' ✓"]]
+
+    UseCase4[["USE CASE 4:<br/>Check for weekend<br/>assignments"]]
+    UseCase4 --> UC4Check[["FOR each assignment:<br/>dueDate = '2024-10-20'"]]
+    UC4Check --> UC4GetDay[["CALL getDayOfWeek(<br/>  '2024-10-20'<br/>)"]]
+    UC4GetDay --> UC4Compare[["IF day === 0 OR day === 6:<br/>It's a weekend"]]
+    UC4Compare --> UC4Warning[["Generate warning:<br/>'Weekend assignment' ⚠️"]]
+
+    %% Comparison: Wrong vs Right
+    subgraph "❌ WRONG WAY (DO NOT USE)"
+        Wrong1[["new Date('2024-10-17')<br/>→ UTC interpretation<br/>→ Date shifts"]]
+        Wrong2[["date.toISOString()<br/>→ Converts to UTC<br/>→ Wrong date string"]]
+        Wrong3[["Compare Date objects directly<br/>→ Includes time component<br/>→ Unreliable"]]
+    end
+
+    subgraph "✅ RIGHT WAY (ALWAYS USE)"
+        Right1[["parseLocalDate('2024-10-17')<br/>→ Local timezone<br/>→ Correct date"]]
+        Right2[["dateToLocalString(date)<br/>→ Local components<br/>→ Correct string"]]
+        Right3[["Compare date strings:<br/>'2024-10-17' === '2024-10-17'<br/>→ Reliable"]]
+    end
+
+    %% Real World Example
+    subgraph "Real World Example: Central Australian Time"
+        Example[["Student in Alice Springs<br/>(UTC+9:30) enters:<br/>'2024-10-17'"]]
+
+        ExampleOld[["❌ OLD: new Date('2024-10-17')<br/>→ 2024-10-17 00:00:00 UTC<br/>→ 2024-10-17 09:30:00 ACST<br/>→ But next day at 00:30!<br/>→ Shows as 2024-10-18 ⚠️"]]
+
+        ExampleNew[["✅ NEW: parseLocalDate('2024-10-17')<br/>→ new Date(2024, 9, 17)<br/>→ 2024-10-17 00:00:00 ACST<br/>→ Stays as 2024-10-17 ✓"]]
+
+        Example --> ExampleOld
+        Example --> ExampleNew
+    end
+
+    %% Key Principles
+    subgraph "Key Principles"
+        Principle1[["1. Store dates as YYYY-MM-DD strings"]]
+        Principle2[["2. Parse strings in LOCAL timezone"]]
+        Principle3[["3. Compare as strings, not Date objects"]]
+        Principle4[["4. Convert to strings using local components"]]
+        Principle5[["5. Never use .toISOString() for dates"]]
+
+        Principle1 --> Principle2 --> Principle3 --> Principle4 --> Principle5
+    end
+
+    UC1Display --> End
+    UC2Display --> End
+    UC3Result --> End
+    UC4Warning --> End
+    ReturnNull1 --> End
+    ReturnNull2 --> End
+
+    End([Dates Work Correctly<br/>in All Timezones ✓])
+
+    %% Styling
+    classDef helper fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef wrong fill:#fed7d7,stroke:#c53030,color:#2d3748
+    classDef right fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef example fill:#fef7de,stroke:#d69e2e,color:#2d3748
+    classDef principle fill:#e8f4fd,stroke:#667eea,color:#2d3748
+
+    class ParseLocal,DateToString,FormatLocal,AddDays,GetDay helper
+    class SplitString,ConvertNumbers,Extract,CreateLocal,GetComponents,CallFormat,ConvertStrings,PadZeros,BuildString,ParseInput,AddDaysCalc,ConvertBack1,ParseInput2,GetDayNum process
+    class Wrong1,Wrong2,Wrong3,ExampleOld wrong
+    class Right1,Right2,Right3,ExampleNew,ReturnDate,ReturnString,ReturnNew,ReturnDay,UC1Display,UC2Display,UC3Result,UC4Warning right
+    class HelperFunctions,CheckNull1,CheckNull2 decision
+    class Example,UC1Input,UC1Parse,UC1Calc,UC2Loop,UC2Format,UC2Compare,UC3Target,UC3Loop,UC3Add,UC4Check,UC4GetDay,UC4Compare example
+    class Principle1,Principle2,Principle3,Principle4,Principle5 principle

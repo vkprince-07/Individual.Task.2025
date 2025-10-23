@@ -1,0 +1,137 @@
+graph TB
+    Start([Teacher Portal Loads]) --> LoadClasses[["loadTeacherClasses():<br/>READ 'teacher-classes'<br/>from localStorage"]]
+
+    LoadClasses --> ParseClasses[["PARSE JSON array<br/>of class objects"]]
+
+    ParseClasses --> UpdateSelector[["updateClassSelector():<br/>Populate dropdown with:<br/>- 'All My Classes'<br/>- Each class name"]]
+
+    UpdateSelector --> RenderList[["renderClassList():<br/>Display class codes<br/>in management modal"]]
+
+    RenderList --> TeacherView[Teacher Dashboard Display]
+
+    TeacherView --> ClassAction{Teacher Action?}
+
+    %% Generate New Class Code Flow
+    ClassAction -->|Click 'My Classes'| OpenModal[Open Class Modal]
+    OpenModal --> ModalDisplay[["Display:<br/>- Input for class name<br/>- List of existing codes<br/>- Copy/Delete buttons"]]
+
+    ModalDisplay --> TeacherInput{Teacher Input?}
+
+    TeacherInput -->|Enter Class Name| GetClassName[["GET className<br/>from input field"]]
+    GetClassName --> ClickGenerate{Click 'Generate'?}
+
+    ClickGenerate -->|Yes| ValidateName{Class name<br/>not empty?}
+
+    ValidateName -->|No| ShowAlert[Alert: 'Please enter<br/>a class name']
+    ShowAlert --> ModalDisplay
+
+    ValidateName -->|Yes| GenerateCode[["Generate unique code:<br/>1. REMOVE spaces from name<br/>2. CONVERT to uppercase<br/>3. GENERATE random string (6 chars)<br/>4. FORMAT: NAME-RANDOM"]]
+
+    GenerateCode --> ExampleCode[["Example:<br/>Input: '10A Mathematics'<br/>Output: '10A-MATHEMATICS-A3F9K2'"]]
+
+    ExampleCode --> CreateClassObject[["CREATE class object:<br/>code = generated<br/>name = className<br/>createdAt = now (ISO)"]]
+
+    CreateClassObject --> AddToArray[["ADD to teacherClasses<br/>array"]]
+
+    AddToArray --> SaveClasses[["SAVE to localStorage<br/>key: 'teacher-classes'<br/>value: JSON array"]]
+
+    SaveClasses --> ClearInput[Clear input field]
+
+    ClearInput --> ReloadClasses[["CALL loadTeacherClasses():<br/>Refresh selector & list"]]
+
+    ReloadClasses --> ModalDisplay
+
+    %% Copy Class Code Flow
+    TeacherInput -->|Click 'Copy'| GetCode[Get class code<br/>to copy]
+    GetCode --> TryCopy{Clipboard API<br/>available?}
+
+    TryCopy -->|Yes| CopyToClipboard[["navigator.clipboard<br/>.writeText(code)"]]
+    TryCopy -->|No| FallbackCopy[["Fallback method:<br/>CREATE textarea<br/>SELECT text<br/>COPY command<br/>REMOVE textarea"]]
+
+    CopyToClipboard --> ShowCopySuccess[Alert: 'Code copied<br/>to clipboard']
+    FallbackCopy --> ShowCopySuccess
+
+    ShowCopySuccess --> ModalDisplay
+
+    %% Delete Class Code Flow
+    TeacherInput -->|Click 'Delete'| ConfirmDelete[Confirm Dialog:<br/>'Delete this class code?']
+
+    ConfirmDelete -->|Cancelled| ModalDisplay
+
+    ConfirmDelete -->|Confirmed| RemoveFromArray[["FILTER teacherClasses<br/>Remove code entry"]]
+
+    RemoveFromArray --> SaveAfterDelete[["SAVE updated array<br/>to localStorage"]]
+
+    SaveAfterDelete --> ReloadAfterDelete[["CALL loadTeacherClasses():<br/>Refresh UI"]]
+
+    ReloadAfterDelete --> CheckSelected{Was deleted code<br/>currently selected?}
+
+    CheckSelected -->|Yes| ResetSelector[["SET selector to 'all'<br/>CALL renderAll()"]]
+    CheckSelected -->|No| ModalDisplay
+
+    ResetSelector --> ModalDisplay
+
+    %% Close Modal Flow
+    TeacherInput -->|Click 'X' or Outside| CloseModal[Close Class Modal]
+    CloseModal --> TeacherView
+
+    %% Class Selector Flow
+    ClassAction -->|Select Class| ClassChange[["onChange event:<br/>GET selected value"]]
+
+    ClassChange --> UpdateSelected[["UPDATE selectedClass<br/>variable"]]
+
+    UpdateSelected --> FilterData[["CALL renderAll():<br/>Re-render with filter"]]
+
+    FilterData --> ApplyFilter[["getFilteredAssignments():<br/>IF 'all':<br/>  Show all teacher's classes<br/>ELSE:<br/>  Show specific class only"]]
+
+    ApplyFilter --> ShowFiltered[Display Filtered Data:<br/>- Calendar<br/>- Statistics<br/>- Insights]
+
+    ShowFiltered --> TeacherView
+
+    %% Student Side: Using Class Code
+    StudentStart([Student Adds Assignment]) --> StudentForm[Assignment Form<br/>with Class Code field]
+
+    StudentForm --> StudentEnters[["Student ENTERS:<br/>Class code from teacher"]]
+
+    StudentEnters --> UpperCase[["Convert to UPPERCASE<br/>before saving"]]
+
+    UpperCase --> SaveAssignment[["SAVE assignment with:<br/>classCode field"]]
+
+    SaveAssignment --> TeacherCanSee{Teacher owns<br/>this class code?}
+
+    TeacherCanSee -->|Yes| VisibleToTeacher[Assignment visible<br/>in teacher portal]
+    TeacherCanSee -->|No| NotVisible[Assignment NOT visible<br/>to teacher]
+
+    VisibleToTeacher --> FilterMatch[["getFilteredAssignments()<br/>matches class code"]]
+    NotVisible --> NoMatch[Not in teacher's<br/>class code list]
+
+    FilterMatch --> TeacherView
+    NoMatch --> End([Assignment stored<br/>but isolated])
+
+    %% Data Storage
+    subgraph "localStorage Structure"
+        Storage1[["'teacher-classes': [<br/>  {<br/>    code: 'CLASS-ABC123',<br/>    name: '10A Math',<br/>    createdAt: '2024-...'<br/>  },<br/>  ...<br/>]"]]
+        Storage2[["'student-assignments': [<br/>  {<br/>    id: 12345,<br/>    classCode: 'CLASS-ABC123',<br/>    ...<br/>  },<br/>  ...<br/>]"]]
+    end
+
+    SaveClasses -.->|Write| Storage1
+    SaveAfterDelete -.->|Update| Storage1
+    LoadClasses -.->|Read| Storage1
+    SaveAssignment -.->|Write| Storage2
+    ApplyFilter -.->|Read| Storage1
+    ApplyFilter -.->|Read| Storage2
+
+    %% Styling
+    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+
+    class LoadClasses,ParseClasses,UpdateSelector,RenderList,OpenModal,ModalDisplay,GenerateCode,CreateClassObject,AddToArray,SaveClasses,ReloadClasses,RemoveFromArray,SaveAfterDelete,ReloadAfterDelete,ResetSelector,ClassChange,UpdateSelected,FilterData,ApplyFilter teacher
+    class StudentStart,StudentForm,StudentEnters,UpperCase,SaveAssignment student
+    class GetClassName,GetCode,CopyToClipboard,FallbackCopy,ClearInput process
+    class Storage1,Storage2 storage
+    class ClassAction,TeacherInput,ClickGenerate,ValidateName,TryCopy,ConfirmDelete,CheckSelected,TeacherCanSee decision
+    class ShowCopySuccess,VisibleToTeacher,FilterMatch success

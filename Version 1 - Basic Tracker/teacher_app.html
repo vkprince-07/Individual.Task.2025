@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Assignment Stress Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #718096;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #e53e3e;
+            background: #f7fafc;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 28px;
+            height: 28px;
+            background: #e53e3e;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .calendar-section {
+            grid-column: 1 / -1;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .month-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .month-btn:hover {
+            background: #c53030;
+        }
+
+        .month-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-header {
+            font-weight: 600;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            min-height: 70px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            border-color: #e53e3e;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(229, 62, 62, 0.2);
+        }
+
+        .stress-0 { background: #c6f6d5; color: #276749; }
+        .stress-1 { background: #fef7de; color: #d69e2e; }
+        .stress-2 { background: #fed7d7; color: #c53030; }
+        .stress-3 { background: #fbb6ce; color: #97266d; }
+
+        .assignment-count {
+            font-size: 0.7rem;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .stats-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-card.danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .insights-section {
+            grid-column: 1 / -1;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 6px solid #e53e3e;
+        }
+
+        .insights-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 3px solid #667eea;
+        }
+
+        .insight-card.warning {
+            border-left-color: #d69e2e;
+        }
+
+        .insight-card.danger {
+            border-left-color: #e53e3e;
+        }
+
+        .insight-card.success {
+            border-left-color: #38a169;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .insight-text {
+            color: #718096;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-recommendation {
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.2s;
+        }
+
+        .close:hover {
+            color: #e53e3e;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .legend {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">👩‍🏫</div>
+                <span>Assignment Stress Radar</span>
+            </div>
+            <nav class="nav-links">
+                <a href="student_app.html" class="nav-link">Student View</a>
+                <a href="#" class="nav-link active">Teacher Dashboard</a>
+                <a href="#" class="nav-link">Reports</a>
+                <a href="#" class="nav-link">Help</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Teacher Dashboard</h1>
+            <p>Visualize student workload patterns and make data-driven decisions to prevent academic burnout and optimize learning outcomes.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-assignments">0</div>
+                    <div class="stat-label">Total Assignments</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-number" id="stress-days">0</div>
+                    <div class="stat-label">High Stress Days</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-number" id="weekend-assignments">0</div>
+                    <div class="stat-label">Weekend Assignments</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="balance-score">Good</div>
+                    <div class="stat-label">Balance Score</div>
+                </div>
+            </div>
+
+            <div class="card calendar-section">
+                <h2 class="card-title">
+                    <div class="card-icon">📅</div>
+                    Student Workload Heatmap
+                </h2>
+
+                <div class="month-nav">
+                    <button class="month-btn" onclick="changeMonth(-1)">← Previous</button>
+                    <div class="month-title" id="current-month">October 2024</div>
+                    <button class="month-btn" onclick="changeMonth(1)">Next →</button>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="calendar-header">Sun</div>
+                    <div class="calendar-header">Mon</div>
+                    <div class="calendar-header">Tue</div>
+                    <div class="calendar-header">Wed</div>
+                    <div class="calendar-header">Thu</div>
+                    <div class="calendar-header">Fri</div>
+                    <div class="calendar-header">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color stress-0"></div>
+                        <span>Low (0-1 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-1"></div>
+                        <span>Moderate (2-3 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-2"></div>
+                        <span>High (4-5 assignments)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color stress-3"></div>
+                        <span>Critical (6+ assignments)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h2 class="insights-title">
+                    📊 Workload Analysis
+                </h2>
+                <div class="insights-grid" id="insights-container">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No student data available</h3>
+                        <p>Students need to input their assignments to see insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Details Modal -->
+    <div id="day-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Assignment Details</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let studentAssignments = JSON.parse(localStorage.getItem('student-assignments')) || [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAll();
+
+            // Auto-refresh data every 5 seconds
+            setInterval(() => {
+                studentAssignments = JSON.parse(localStorage.getItem('student-assignments')) || [];
+                renderAll();
+            }, 5000);
+        });
+
+        function renderAll() {
+            updateStats();
+            renderCalendar();
+            generateInsights();
+        }
+
+        function updateStats() {
+            const total = studentAssignments.length;
+
+            // Count stress days
+            const assignmentsByDay = {};
+            studentAssignments.forEach(a => {
+                const date = new Date(a.dueDate);
+                if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+                    assignmentsByDay[a.dueDate] = (assignmentsByDay[a.dueDate] || 0) + 1;
+                }
+            });
+
+            const stressDays = Object.values(assignmentsByDay).filter(count => count >= 4).length;
+
+            // Weekend assignments
+            const weekendCount = studentAssignments.filter(a => {
+                const day = new Date(a.dueDate).getDay();
+                return day === 0 || day === 6;
+            }).length;
+
+            // Balance score
+            const dailyLoads = Object.values(assignmentsByDay);
+            const avgLoad = dailyLoads.length > 0 ? dailyLoads.reduce((a, b) => a + b, 0) / dailyLoads.length : 0;
+            let balanceScore = avgLoad <= 2 ? 'Excellent' : avgLoad <= 3 ? 'Good' : avgLoad <= 4 ? 'Fair' : 'Poor';
+
+            document.getElementById('total-assignments').textContent = total;
+            document.getElementById('stress-days').textContent = stressDays;
+            document.getElementById('weekend-assignments').textContent = weekendCount;
+            document.getElementById('balance-score').textContent = balanceScore;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthTitle = document.getElementById('current-month');
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            monthTitle.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Clear existing days
+            const existingDays = grid.querySelectorAll('.calendar-day');
+            existingDays.forEach(day => day.remove());
+
+            // Add empty cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            // Add days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+
+                const date = new Date(currentYear, currentMonth, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const assignmentsOnDay = studentAssignments.filter(a => a.dueDate === dateStr);
+                const stressLevel = getStressLevel(assignmentsOnDay.length);
+
+                dayElement.classList.add(`stress-${stressLevel}`);
+                dayElement.innerHTML = `
+                    <div>${day}</div>
+                    <div class="assignment-count">${assignmentsOnDay.length}</div>
+                `;
+
+                dayElement.addEventListener('click', () => showDayDetails(date, assignmentsOnDay));
+                grid.appendChild(dayElement);
+            }
+        }
+
+        function getStressLevel(count) {
+            if (count <= 1) return 0;
+            if (count <= 3) return 1;
+            if (count <= 5) return 2;
+            return 3;
+        }
+
+        function showDayDetails(date, assignments) {
+            const modal = document.getElementById('day-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            title.textContent = `${date.toLocaleDateString()} - ${assignments.length} Assignment(s)`;
+
+            if (assignments.length === 0) {
+                body.innerHTML = '<p style="color: #718096;">No assignments due on this date.</p>';
+            } else {
+                const stressLevel = getStressLevel(assignments.length);
+                const stressLabels = ['Low Stress', 'Moderate Stress', 'High Stress', 'Critical Stress'];
+                const stressColors = ['#38a169', '#d69e2e', '#e53e3e', '#97266d'];
+
+                body.innerHTML = `
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                        <strong>Stress Level: </strong>
+                        <span style="color: ${stressColors[stressLevel]}; font-weight: 600;">
+                            ${stressLabels[stressLevel]}
+                        </span>
+                    </div>
+                    ${assignments.map(a => `
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid #667eea;">
+                            <strong>${a.subject}</strong>: ${a.assignment}
+                            ${a.description ? `<br><small style="color: #718096;">${a.description}</small>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function generateInsights() {
+            const container = document.getElementById('insights-container');
+
+            if (studentAssignments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No student data available</h3>
+                        <p>Students need to input their assignments to see insights.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const insights = [];
+
+            // High stress analysis
+            const assignmentsByDay = {};
+            studentAssignments.forEach(a => {
+                assignmentsByDay[a.dueDate] = (assignmentsByDay[a.dueDate] || 0) + 1;
+            });
+
+            const criticalDays = Object.entries(assignmentsByDay)
+                .filter(([date, count]) => count >= 4).length;
+
+            if (criticalDays > 0) {
+                insights.push({
+                    type: 'danger',
+                    title: 'Critical Workload Alert',
+                    text: `${criticalDays} days have 4+ simultaneous assignments. Research shows this reduces performance by 35% and increases stress significantly.`,
+                    recommendation: 'Redistribute assignments to prevent academic overload and improve outcomes.'
+                });
+            }
+
+            // Subject balance
+            const subjectCounts = {};
+            studentAssignments.forEach(a => {
+                subjectCounts[a.subject] = (subjectCounts[a.subject] || 0) + 1;
+            });
+
+            const subjects = Object.entries(subjectCounts).sort(([,a], [,b]) => b - a);
+            if (subjects.length > 1 && subjects[0][1] > subjects[1][1] * 1.5) {
+                insights.push({
+                    type: 'warning',
+                    title: 'Subject Workload Imbalance',
+                    text: `${subjects[0][0]} accounts for ${Math.round(subjects[0][1]/studentAssignments.length*100)}% of total assignments, creating uneven academic pressure.`,
+                    recommendation: 'Consider coordinating with other teachers to balance subject loads.'
+                });
+            }
+
+            // Weekend assignments
+            const weekendCount = studentAssignments.filter(a => {
+                const day = new Date(a.dueDate).getDay();
+                return day === 0 || day === 6;
+            }).length;
+
+            if (weekendCount > 0) {
+                insights.push({
+                    type: 'warning',
+                    title: 'Work-Life Balance Impact',
+                    text: `${weekendCount} assignments (${Math.round(weekendCount/studentAssignments.length*100)}%) due on weekends affect family time and student wellbeing.`,
+                    recommendation: 'Move weekend assignments to weekdays to support better work-life balance.'
+                });
+            }
+
+            // Positive insights
+            if (insights.length === 0) {
+                insights.push({
+                    type: 'success',
+                    title: 'Excellent Workload Management',
+                    text: 'Current assignment distribution shows thoughtful planning and consideration for student wellbeing.',
+                    recommendation: 'Continue current practices. This balanced approach optimizes learning outcomes.'
+                });
+            }
+
+            container.innerHTML = insights.map(insight => `
+                <div class="insight-card ${insight.type}">
+                    <div class="insight-title">${insight.title}</div>
+                    <div class="insight-text">${insight.text}</div>
+                    <div class="insight-recommendation">💡 ${insight.recommendation}</div>
+                </div>
+            `).join('');
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderAll();
+        }
+
+        function closeModal() {
+            document.getElementById('day-modal').style.display = 'none';
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('day-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

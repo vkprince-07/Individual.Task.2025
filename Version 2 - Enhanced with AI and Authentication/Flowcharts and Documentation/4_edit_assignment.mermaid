@@ -1,0 +1,121 @@
+graph TB
+    Start([Student Portal<br/>Assignment List]) --> DisplayList[["Display All Assignments<br/>with Edit & Delete buttons"]]
+
+    DisplayList --> UserAction{User Action?}
+
+    %% Edit Flow
+    UserAction -->|Click 'Edit'| GetID[["GET assignment ID<br/>from button click"]]
+
+    GetID --> FindAssignment[["FIND assignment in array:<br/>assignment = assignments<br/>.find(a => a.id === id)"]]
+
+    FindAssignment --> AssignmentFound{Assignment<br/>found?}
+
+    AssignmentFound -->|No| ErrorReturn[Return to list]
+    ErrorReturn --> DisplayList
+
+    AssignmentFound -->|Yes| PopulateModal[["Populate Edit Modal:<br/>SET edit-subject = a.subject<br/>SET edit-assignment = a.assignment<br/>SET edit-due-date = a.dueDate<br/>SET edit-class-code = a.classCode<br/>SET edit-description = a.description<br/>SET edit-assignment-id = a.id (hidden)"]]
+
+    PopulateModal --> ShowModal[Display Edit Modal<br/>with pre-filled form]
+
+    ShowModal --> ModalAction{User Action<br/>in Modal?}
+
+    ModalAction -->|Click 'X' or Outside| CloseNoSave[Close Edit Modal]
+    CloseNoSave --> DisplayList
+
+    ModalAction -->|Modify Fields| EditFields[["User EDITS:<br/>- Subject<br/>- Assignment Title<br/>- Due Date<br/>- Class Code<br/>- Description"]]
+
+    EditFields --> ModalAction
+
+    ModalAction -->|Click 'Save Changes'| SubmitForm[Submit Edit Form]
+
+    SubmitForm --> GetUpdatedData[["READ form values:<br/>subject = edit-subject<br/>assignment = edit-assignment<br/>dueDate = edit-due-date<br/>classCode = edit-class-code<br/>description = edit-description<br/>id = edit-assignment-id"]]
+
+    GetUpdatedData --> FindIndex[["FIND assignment index:<br/>index = assignments<br/>.findIndex(a => a.id === id)"]]
+
+    FindIndex --> IndexFound{Index found<br/>(index !== -1)?}
+
+    IndexFound -->|No| ShowError[Show error message]
+    ShowError --> ShowModal
+
+    IndexFound -->|Yes| UpdateAssignment[["UPDATE assignment:<br/>assignments[index] = {<br/>  ...assignments[index],<br/>  subject: trimmed,<br/>  assignment: trimmed,<br/>  dueDate: value,<br/>  classCode: uppercase,<br/>  description: trimmed<br/>}"]]
+
+    UpdateAssignment --> PreserveData[["PRESERVE original data:<br/>- id (unchanged)<br/>- dateAdded (unchanged)<br/>- Update only edited fields"]]
+
+    PreserveData --> SaveToStorage[["SAVE to localStorage:<br/>key: 'student-assignments'<br/>value: updated JSON array"]]
+
+    SaveToStorage --> RenderAll[["CALL renderAll():<br/>Refresh all views"]]
+
+    RenderAll --> UpdateViews[["Update displays:<br/>- Statistics<br/>- Upcoming assignments<br/>- Calendar<br/>- All assignments list"]]
+
+    UpdateViews --> CloseModal[Close Edit Modal]
+
+    CloseModal --> ShowSuccess[Display Success Alert<br/>✅ 3 seconds]
+
+    ShowSuccess --> DisplayList
+
+    %% Delete Flow (for comparison)
+    UserAction -->|Click 'Delete'| ConfirmDelete[Confirm Dialog:<br/>'Delete this assignment?']
+
+    ConfirmDelete -->|Cancelled| DisplayList
+
+    ConfirmDelete -->|Confirmed| DeleteAssignment[["FILTER array:<br/>assignments = assignments<br/>.filter(a => a.id !== id)"]]
+
+    DeleteAssignment --> SaveAfterDelete[["SAVE to localStorage:<br/>Updated array"]]
+
+    SaveAfterDelete --> RenderAfterDelete[["CALL renderAll():<br/>Refresh all views"]]
+
+    RenderAfterDelete --> DisplayList
+
+    %% Calendar Integration
+    UpdateViews --> CheckCalendar{Date changed?}
+
+    CheckCalendar -->|Yes| UpdateCalendar[["Calendar re-renders:<br/>- Remove from old date<br/>- Add to new date<br/>- Update stress levels"]]
+    CheckCalendar -->|No| CalendarUnchanged[Calendar shows<br/>updated details]
+
+    UpdateCalendar --> CalendarReflect
+    CalendarUnchanged --> CalendarReflect[Assignment visible<br/>on calendar]
+
+    CalendarReflect --> TeacherView{Teacher has<br/>this class code?}
+
+    TeacherView -->|Yes| TeacherSees[["Teacher portal shows:<br/>Updated assignment<br/>on new date"]]
+    TeacherView -->|No| TeacherNoSee[Not visible<br/>to teacher]
+
+    TeacherSees --> Complete
+    TeacherNoSee --> Complete([Edit Complete])
+
+    %% Data Flow Diagram
+    subgraph "Data Preservation Rules"
+        PreserveRules[["PRESERVE:<br/>✓ id (unique identifier)<br/>✓ dateAdded (creation time)<br/><br/>UPDATE:<br/>✓ subject<br/>✓ assignment<br/>✓ dueDate<br/>✓ classCode<br/>✓ description"]]
+    end
+
+    %% Modal Behavior
+    subgraph "Modal Close Behavior"
+        ModalClose[["Click outside modal OR<br/>Click X button:<br/>→ Close without saving<br/>→ No changes applied"]]
+    end
+
+    %% Impact Analysis
+    subgraph "Impact of Edit on Views"
+        ImpactStats[["Statistics:<br/>Recalculate totals,<br/>subjects, stress"]]
+        ImpactUpcoming[["Upcoming:<br/>Re-filter this week,<br/>resort by date"]]
+        ImpactCalendar[["Calendar:<br/>Update day counts,<br/>stress colors"]]
+        ImpactList[["All Assignments:<br/>Resort by date,<br/>update badges"]]
+
+        ImpactStats --> ImpactUpcoming --> ImpactCalendar --> ImpactList
+    end
+
+    %% Styling
+    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef modal fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#e8f4fd,stroke:#667eea,color:#2d3748
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef error fill:#fed7d7,stroke:#c53030,color:#2d3748
+
+    class DisplayList,GetID,FindAssignment,FindIndex,UpdateAssignment,PreserveData,SaveToStorage,RenderAll,UpdateViews,DeleteAssignment,SaveAfterDelete,RenderAfterDelete student
+    class GetUpdatedData,EditFields,UpdateCalendar process
+    class PopulateModal,ShowModal,CloseModal,CloseNoSave modal
+    class SaveToStorage,SaveAfterDelete storage
+    class UserAction,AssignmentFound,ModalAction,IndexFound,ConfirmDelete,CheckCalendar,TeacherView decision
+    class ShowSuccess,TeacherSees,CalendarReflect success
+    class ShowError,ErrorReturn error

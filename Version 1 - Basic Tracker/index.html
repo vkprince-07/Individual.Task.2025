@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Stress Radar - St Philip's College</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .launcher-container {
+            max-width: 900px;
+            width: 90%;
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        
+        .college-info {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .college-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .college-subtitle {
+            opacity: 0.8;
+        }
+        
+        .launcher-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .launcher-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .launcher-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .launcher-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.4);
+        }
+        
+        .launcher-card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .card-description {
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-features {
+            list-style: none;
+            text-align: left;
+        }
+        
+        .card-features li {
+            padding: 0.3rem 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .card-features li::before {
+            content: '✓ ';
+            color: #4ade80;
+            font-weight: bold;
+        }
+        
+        .info-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .info-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+        }
+        
+        .info-item {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .info-item h4 {
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .info-item p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 768px) {
+            .launcher-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .launcher-container {
+                padding: 2rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="launcher-container">
+        <div class="header">
+            <div class="logo">🎯</div>
+            <h1 class="title">Assignment Stress Radar</h1>
+            <p class="subtitle">
+                Intelligent assignment scheduling system designed to prevent academic burnout 
+                and optimize student learning outcomes through data-driven workload management.
+            </p>
+        </div>
+        
+        <div class="college-info">
+            <div class="college-name">St Philip's College</div>
+            <div class="college-subtitle">Excellence in Education • Student Wellbeing First</div>
+        </div>
+        
+        <div class="launcher-grid">
+            <a href="student_app.html" class="launcher-card">
+                <span class="card-icon">📚</span>
+                <h2 class="card-title">Student Portal</h2>
+                <p class="card-description">
+                    Input your assignment due dates and track your academic workload with intelligent insights.
+                </p>
+                <ul class="card-features">
+                    <li>Easy assignment tracking</li>
+                    <li>Stress level monitoring</li>
+                    <li>Upcoming deadline alerts</li>
+                    <li>Personal workload analytics</li>
+                </ul>
+            </a>
+            
+            <a href="teacher_app.html" class="launcher-card">
+                <span class="card-icon">👩‍🏫</span>
+                <h2 class="card-title">Teacher Dashboard</h2>
+                <p class="card-description">
+                    Get AI-powered scheduling suggestions and visualize student workload patterns across all subjects.
+                </p>
+                <ul class="card-features">
+                    <li>Smart assignment scheduling</li>
+                    <li>AI-powered date suggestions</li>
+                    <li>Student workload heatmap</li>
+                    <li>Real-time stress analytics</li>
+                </ul>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h3 class="info-title">System Benefits</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <h4>Prevent Burnout</h4>
+                    <p>AI algorithms detect when students are overloaded and suggest optimal assignment distribution.</p>
+                </div>
+                <div class="info-item">
+                    <h4>Improve Performance</h4>
+                    <p>Balanced workload distribution leads to better academic outcomes and reduced stress levels.</p>
+                </div>
+                <div class="info-item">
+                    <h4>Data-Driven Insights</h4>
+                    <p>Real-time analytics help teachers make informed decisions about assignment scheduling.</p>
+                </div>
+                <div class="info-item">
+                    <h4>Collaborative Planning</h4>
+                    <p>Cross-subject awareness ensures coordinated planning and optimal student experience.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

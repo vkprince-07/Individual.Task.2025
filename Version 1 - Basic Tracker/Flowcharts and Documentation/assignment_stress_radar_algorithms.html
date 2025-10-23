@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Stress Radar - Algorithm Flowcharts</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .flowchart-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #1a202c;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Assignment Stress Radar - Core Algorithms</h1>
+            <p>Detailed algorithmic flows with pseudocode integration</p>
+        </div>
+        
+        <div class="algorithm-grid">
+            <div class="flowchart-section">
+                <h2 class="section-title">📊 Stress Level Calculation Algorithm</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        Start([Start: Calculate Stress Level])
+                        Input[/"INPUT: assignmentCount (integer)"/]
+                        Start --> Input
+                        Input --> Check1{assignmentCount <= 1?}
+                        
+                        Check1 -->|Yes| Level0[["RETURN 0<br/>Stress: Low<br/>Color: Green (#c6f6d5)<br/>Label: '0-1 assignments'"]]
+                        Check1 -->|No| Check2{assignmentCount <= 3?}
+                        
+                        Check2 -->|Yes| Level1[["RETURN 1<br/>Stress: Moderate<br/>Color: Yellow (#fef7de)<br/>Label: '2-3 assignments'"]]
+                        Check2 -->|No| Check3{assignmentCount <= 5?}
+                        
+                        Check3 -->|Yes| Level2[["RETURN 2<br/>Stress: High<br/>Color: Orange (#fed7d7)<br/>Label: '4-5 assignments'"]]
+                        Check3 -->|No| Level3[["RETURN 3<br/>Stress: Critical<br/>Color: Red (#fbb6ce)<br/>Label: '6+ assignments'"]]
+                        
+                        Level0 --> Apply[Apply to Calendar Day]
+                        Level1 --> Apply
+                        Level2 --> Apply
+                        Level3 --> Apply
+                        Apply --> End([End])
+                        
+                        style Level0 fill:#c6f6d5,stroke:#38a169
+                        style Level1 fill:#fef7de,stroke:#d69e2e
+                        style Level2 fill:#fed7d7,stroke:#e53e3e
+                        style Level3 fill:#fbb6ce,stroke:#97266d
+                </div>
+            </div>
+            
+            <div class="flowchart-section">
+                <h2 class="section-title">⏰ Days Until Due Calculation</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        Start2([Start: Calculate Days Until Due])
+                        Input2[/"INPUT: dueDate (string YYYY-MM-DD)"/]
+                        Start2 --> Input2
+                        
+                        Convert[["CONVERT dueDate to Date object"]]
+                        Input2 --> Convert
+                        
+                        GetToday[["GET current date"]]
+                        Convert --> GetToday
+                        
+                        CalcDiff[["CALCULATE difference:<br/>diff = dueDate - today<br/>Convert to milliseconds"]]
+                        GetToday --> CalcDiff
+                        
+                        ConvertDays[["CONVERT to days:<br/>days = diff / (1000*60*60*24)<br/>ROUND up to nearest integer"]]
+                        CalcDiff --> ConvertDays
+                        
+                        CheckDays{Check Days Value}
+                        ConvertDays --> CheckDays
+                        
+                        CheckDays -->|"days < 0"| Overdue[["Badge: 'Overdue'<br/>Color: Red<br/>Priority: Critical"]]
+                        CheckDays -->|"days = 0"| Today[["Badge: 'Due Today!'<br/>Color: Red<br/>Priority: Critical"]]
+                        CheckDays -->|"days = 1"| Tomorrow[["Badge: 'Due Tomorrow'<br/>Color: Orange<br/>Priority: High"]]
+                        CheckDays -->|"days <= 3"| Soon[["Badge: 'X days left'<br/>Color: Orange<br/>Priority: Medium"]]
+                        CheckDays -->|"days > 3"| Later[["Badge: 'X days left'<br/>Color: Green<br/>Priority: Low"]]
+                        
+                        Overdue --> Return[["RETURN days, badge, priority"]]
+                        Today --> Return
+                        Tomorrow --> Return
+                        Soon --> Return
+                        Later --> Return
+                        
+                        Return --> End2([End])
+                        
+                        style Overdue fill:#fed7d7,stroke:#e53e3e
+                        style Today fill:#fed7d7,stroke:#e53e3e
+                        style Tomorrow fill:#fef7de,stroke:#d69e2e
+                        style Soon fill:#fef7de,stroke:#d69e2e
+                        style Later fill:#c6f6d5,stroke:#38a169
+                </div>
+            </div>
+        </div>
+        
+        <div class="flowchart-section">
+            <h2 class="section-title">🔍 Generate Insights Algorithm</h2>
+            <div class="mermaid">
+                flowchart TD
+                    StartI([Start: Generate Insights])
+                    CheckData{studentAssignments.length = 0?}
+                    
+                    StartI --> CheckData
+                    CheckData -->|Yes| EmptyState[["DISPLAY:<br/>'No student data available'<br/>EXIT function"]]
+                    CheckData -->|No| InitInsights[["INITIALIZE insights = []"]]
+                    
+                    InitInsights --> GroupByDay[["GROUP assignments by date<br/>assignmentsByDay = {}"]]
+                    
+                    GroupByDay --> CountCritical[["COUNT critical days:<br/>days with 4+ assignments"]]
+                    
+                    CountCritical --> CheckCritical{criticalDays > 0?}
+                    CheckCritical -->|Yes| AddCritical[["ADD insight:<br/>Type: DANGER<br/>Title: 'Critical Workload Alert'<br/>Text: 'X days have 4+ assignments'<br/>Recommendation: 'Redistribute'"]]
+                    CheckCritical -->|No| CheckSubject
+                    
+                    AddCritical --> CheckSubject[["GROUP by subject<br/>COUNT per subject<br/>SORT by count"]]
+                    
+                    CheckSubject --> CheckImbalance{top subject > 50% more than second?}
+                    CheckImbalance -->|Yes| AddImbalance[["ADD insight:<br/>Type: WARNING<br/>Title: 'Subject Workload Imbalance'<br/>Text: 'Subject X = Y% of total'<br/>Recommendation: 'Coordinate'"]]
+                    CheckImbalance -->|No| CheckWeekend
+                    
+                    AddImbalance --> CheckWeekend[["COUNT weekend assignments<br/>(Saturday OR Sunday)"]]
+                    
+                    CheckWeekend --> CheckWeekendCount{weekendCount > 0?}
+                    CheckWeekendCount -->|Yes| AddWeekend[["ADD insight:<br/>Type: WARNING<br/>Title: 'Work-Life Balance Impact'<br/>Text: 'X assignments on weekends'<br/>Recommendation: 'Move to weekdays'"]]
+                    CheckWeekendCount -->|No| CheckEmpty
+                    
+                    AddWeekend --> CheckEmpty{insights.length = 0?}
+                    CheckEmpty -->|Yes| AddSuccess[["ADD insight:<br/>Type: SUCCESS<br/>Title: 'Excellent Workload Management'<br/>Text: 'Balanced distribution'<br/>Recommendation: 'Continue practices'"]]
+                    CheckEmpty -->|No| Display
+                    
+                    AddSuccess --> Display[["DISPLAY all insights<br/>with color coding"]]
+                    Display --> EndI([End])
+                    
+                    style AddCritical fill:#fed7d7,stroke:#e53e3e
+                    style AddImbalance fill:#fef7de,stroke:#d69e2e
+                    style AddWeekend fill:#fef7de,stroke:#d69e2e
+                    style AddSuccess fill:#c6f6d5,stroke:#38a169
+            </div>
+        </div>
+        
+        <div class="flowchart-section">
+            <h2 class="section-title">🔄 Auto-Refresh Mechanism (Teacher Dashboard)</h2>
+            <div class="mermaid">
+                flowchart TD
+                    StartR([Page Load])
+                    Init[["INITIALIZE:<br/>currentMonth = current month<br/>currentYear = current year<br/>studentAssignments = []"]]
+                    
+                    StartR --> Init
+                    Init --> FirstLoad[["LOAD from localStorage:<br/>studentAssignments =<br/>JSON.parse(localStorage['student-assignments'])"]]
+                    
+                    FirstLoad --> FirstRender[["CALL renderAll():<br/>- updateStats()<br/>- renderCalendar()<br/>- generateInsights()"]]
+                    
+                    FirstRender --> SetTimer[["SET interval timer:<br/>Every 5000ms (5 seconds)"]]
+                    
+                    SetTimer --> Timer{5 seconds elapsed?}
+                    Timer -->|No| Wait[Wait...]
+                    Wait --> Timer
+                    
+                    Timer -->|Yes| Refresh[["RELOAD data:<br/>studentAssignments =<br/>JSON.parse(localStorage['student-assignments'])"]]
+                    
+                    Refresh --> CheckChange{Data changed?}
+                    CheckChange -->|Yes| UpdateAll[["CALL renderAll():<br/>- Update statistics<br/>- Refresh calendar<br/>- Regenerate insights"]]
+                    CheckChange -->|No| Timer
+                    
+                    UpdateAll --> Timer
+                    
+                    style SetTimer fill:#667eea,stroke:#5a67d8,color:#fff
+                    style Refresh fill:#38a169,stroke:#2f855a,color:#fff
+                    style UpdateAll fill:#e53e3e,stroke:#c53030,color:#fff
+            </div>
+        </div>
+        
+        <div class="flowchart-section">
+            <h2 class="section-title">💾 Data Storage Structure</h2>
+            <div class="mermaid">
+                flowchart LR
+                    subgraph "Student Portal"
+                        SP1[Add Assignment]
+                        SP2[Delete Assignment]
+                        SP3[View Assignments]
+                    end
+                    
+                    subgraph "localStorage"
+                        Storage[["'student-assignments'<br/>JSON Array:<br/>[{<br/>  id: timestamp,<br/>  subject: string,<br/>  assignment: string,<br/>  dueDate: YYYY-MM-DD,<br/>  description: string,<br/>  dateAdded: ISO string<br/>}]"]]
+                    end
+                    
+                    subgraph "Teacher Dashboard"
+                        TD1[View Heatmap]
+                        TD2[View Insights]
+                        TD3[Auto-Refresh]
+                    end
+                    
+                    SP1 -->|Write| Storage
+                    SP2 -->|Update| Storage
+                    SP3 -->|Read| Storage
+                    
+                    Storage -->|Read| TD1
+                    Storage -->|Read| TD2
+                    Storage -->|Read Every 5s| TD3
+                    
+                    style Storage fill:#d69e2e,stroke:#b7791f,color:#fff
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 15
+            }
+        });
+    </script>
+</body>
+</html>

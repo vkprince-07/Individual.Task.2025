@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Version 2 - Enhanced Features Flowcharts</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 40px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #1a202c;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .flowchart-container {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer {
+            background: #1a202c;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Assignment Stress Radar - Version 2</h1>
+            <p>Enhanced Features Flowcharts</p>
+        </div>
+
+        <!-- Authentication System -->
+        <div class="section">
+            <h2 class="section-title">1. Authentication System</h2>
+            <div class="flowchart-container">
+                <div class="mermaid">
+graph TB
+    Start([User Opens Website]) --> CheckSession{Check localStorage<br/>for user-session}
+
+    CheckSession -->|Session Exists| ValidateSession{Validate<br/>Session Data}
+    ValidateSession -->|Role = student| RedirectStudent[Redirect to<br/>student_app.html]
+    ValidateSession -->|Role = teacher| RedirectTeacher[Redirect to<br/>teacher_app.html]
+    ValidateSession -->|Invalid| ShowLogin
+
+    CheckSession -->|No Session| ShowLogin[Display Login Page<br/>index.html]
+
+    ShowLogin --> LoginForm[Login Form Display]
+    LoginForm --> UserInput[["User Enters:<br/>- User Type: student or teacher<br/>- Username<br/>- Password"]]
+
+    UserInput --> SubmitForm[Submit Button Clicked]
+    SubmitForm --> ValidateCredentials{Validate Against<br/>Demo Accounts}
+
+    ValidateCredentials -->|Student Match| CheckStudent{Username = student<br/>AND<br/>Password = student123}
+    ValidateCredentials -->|Teacher Match| CheckTeacher{Username = teacher<br/>AND<br/>Password = teacher123}
+
+    CheckStudent -->|Valid| CreateStudentSession[["CREATE session object:<br/>role = student<br/>username = input<br/>loginTime = now"]]
+    CheckTeacher -->|Valid| CreateTeacherSession[["CREATE session object:<br/>role = teacher<br/>username = input<br/>loginTime = now"]]
+
+    CreateStudentSession --> SaveStudentSession[["SAVE to localStorage<br/>key: user-session<br/>value: JSON session"]]
+    CreateTeacherSession --> SaveTeacherSession[["SAVE to localStorage<br/>key: user-session<br/>value: JSON session"]]
+
+    SaveStudentSession --> RedirectToStudent[Redirect to<br/>student_app.html]
+    SaveTeacherSession --> RedirectToTeacher[Redirect to<br/>teacher_app.html]
+
+    CheckStudent -->|Invalid| ShowError[Display Error Message<br/>❌ 3 seconds]
+    CheckTeacher -->|Invalid| ShowError
+    ValidateCredentials -->|No Match| ShowError
+
+    ShowError --> LoginForm
+
+    RedirectToStudent --> StudentAuth[["Student Portal<br/>checkAuth:<br/>READ user-session<br/>VERIFY role = student"]]
+    RedirectToTeacher --> TeacherAuth[["Teacher Portal<br/>checkAuth:<br/>READ user-session<br/>VERIFY role = teacher"]]
+
+    StudentAuth -->|Valid| StudentPortal[Load Student Portal<br/>Display username]
+    TeacherAuth -->|Valid| TeacherPortal[Load Teacher Portal<br/>Display username]
+
+    StudentAuth -->|Invalid| ForceLogin[Redirect to index.html]
+    TeacherAuth -->|Invalid| ForceLogin
+
+    StudentPortal --> StudentLogout{User Clicks<br/>Logout?}
+    TeacherPortal --> TeacherLogout{User Clicks<br/>Logout?}
+
+    StudentLogout -->|Yes| ConfirmStudent[Confirm Dialog<br/>Are you sure?]
+    TeacherLogout -->|Yes| ConfirmTeacher[Confirm Dialog<br/>Are you sure?]
+
+    ConfirmStudent -->|Confirmed| RemoveSession1[["REMOVE from localStorage<br/>key: user-session"]]
+    ConfirmTeacher -->|Confirmed| RemoveSession2[["REMOVE from localStorage<br/>key: user-session"]]
+
+    RemoveSession1 --> ForceLogin
+    RemoveSession2 --> ForceLogin
+
+    ForceLogin --> ShowLogin
+
+    StudentLogout -->|No| StudentPortal
+    TeacherLogout -->|No| TeacherPortal
+
+    ConfirmStudent -->|Cancelled| StudentPortal
+    ConfirmTeacher -->|Cancelled| TeacherPortal
+
+    subgraph "Demo Accounts - Hard-coded"
+        DemoStudent[["Student Account:<br/>username: student<br/>password: student123<br/>role: student"]]
+        DemoTeacher[["Teacher Account:<br/>username: teacher<br/>password: teacher123<br/>role: teacher"]]
+    end
+
+    ValidateCredentials -.->|Compare| DemoStudent
+    ValidateCredentials -.->|Compare| DemoTeacher
+
+    classDef auth fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef student fill:#38a169,stroke:#2f855a,color:#fff
+    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef error fill:#fed7d7,stroke:#c53030,color:#2d3748
+
+    class ShowLogin,LoginForm,UserInput,SubmitForm auth
+    class StudentAuth,StudentPortal,StudentLogout,RedirectToStudent,RedirectStudent student
+    class TeacherAuth,TeacherPortal,TeacherLogout,RedirectToTeacher,RedirectTeacher teacher
+    class CreateStudentSession,CreateTeacherSession,SaveStudentSession,SaveTeacherSession,RemoveSession1,RemoveSession2,DemoStudent,DemoTeacher storage
+    class CheckSession,ValidateSession,ValidateCredentials,CheckStudent,CheckTeacher,ConfirmStudent,ConfirmTeacher decision
+    class ShowError error
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestion Algorithm -->
+        <div class="section">
+            <h2 class="section-title">2. AI Suggestion Algorithm</h2>
+            <div class="flowchart-container">
+                <div class="mermaid">
+graph TB
+    Start([Teacher Enters<br/>Assignment Details]) --> GetInput[["GET Input:<br/>- Subject<br/>- Assignment Title<br/>- Desired Due Date"]]
+
+    GetInput --> ParseDate[["parseLocalDate():<br/>Convert date string to<br/>local Date object"]]
+
+    ParseDate --> FilterAssignments[["getFilteredAssignments():<br/>Get only assignments from<br/>teacher's class codes"]]
+
+    FilterAssignments --> CheckDesiredDate[["Count assignments<br/>on desired date"]]
+
+    CheckDesiredDate --> CalculateStress{Calculate<br/>Stress Level}
+
+    CalculateStress -->|Count >= 6| CriticalStress[["Stress Level = 3<br/>CRITICAL"]]
+    CalculateStress -->|Count 4-5| HighStress[["Stress Level = 2<br/>HIGH"]]
+    CalculateStress -->|Count 2-3| ModerateStress[["Stress Level = 1<br/>MODERATE"]]
+    CalculateStress -->|Count 0-1| LowStress[["Stress Level = 0<br/>LOW"]]
+
+    CriticalStress --> GenCritical[["Generate Suggestion:<br/>🚨 CRITICAL RISK<br/>List all conflicting assignments<br/>Warn about performance drop"]]
+    HighStress --> GenHigh[["Generate Suggestion:<br/>⚠️ HIGH RISK<br/>List assignments<br/>25% performance drop warning"]]
+    ModerateStress --> GenModerate[["Generate Suggestion:<br/>ℹ️ MODERATE<br/>Manageable workload"]]
+    LowStress --> GenLow[["Generate Suggestion:<br/>✅ OPTIMAL<br/>Excellent choice"]]
+
+    GenCritical --> CheckWeek
+    GenHigh --> CheckWeek
+    GenModerate --> CheckWeek
+    GenLow --> CheckWeek
+
+    CheckWeek[["Calculate Week Context:<br/>Get week start (Sunday)<br/>Count assignments in week"]]
+
+    CheckWeek --> WeekCheck{Weekly<br/>Assignment Count}
+
+    WeekCheck -->|>= 10| WeekOverload[["Generate Warning:<br/>📊 WEEK OVERLOAD<br/>Exceeds 8-assignment max"]]
+    WeekCheck -->|6-9| WeekHeavy[["Generate Warning:<br/>📈 HEAVY WEEK<br/>Monitor stress levels"]]
+    WeekCheck -->|< 6| WeekOK[Week Load Acceptable]
+
+    WeekOverload --> CheckWeekend
+    WeekHeavy --> CheckWeekend
+    WeekOK --> CheckWeekend
+
+    CheckWeekend{Check Day<br/>of Week}
+
+    CheckWeekend -->|Sunday or Saturday| WeekendWarning[["Generate Warning:<br/>🏖️ WEEKEND ALERT<br/>Affects family time<br/>35-40% lower completion"]]
+    CheckWeekend -->|Weekday| CheckStressForAlternatives
+
+    WeekendWarning --> CheckStressForAlternatives
+
+    CheckStressForAlternatives{Stress Level<br/>>= 1?}
+
+    CheckStressForAlternatives -->|Yes| FindAlternatives[["findOptimalAlternatives():<br/>Search range:<br/>-7 to +21 days"]]
+    CheckStressForAlternatives -->|No| DisplaySuggestions
+
+    FindAlternatives --> LoopDates[["FOR each day in range:<br/>i = -7 to +21<br/>(skip i = 0)"]]
+
+    LoopDates --> AddDaysCalc[["Calculate date:<br/>altDate = addDays(targetDate, i)"]]
+
+    AddDaysCalc --> SkipPast{Date is<br/>in past?}
+
+    SkipPast -->|Yes| NextIteration
+    SkipPast -->|No| ScoreDate[["calculateDateScore():<br/>Start score = 100"]]
+
+    ScoreDate --> ScoreAssignments[["Penalty for existing:<br/>-15 per assignment"]]
+    ScoreAssignments --> ScoreWeekend[["Weekend penalty:<br/>-30 for Sat/Sun<br/>-10 for Friday<br/>-5 for Monday"]]
+    ScoreWeekend --> ScoreWeekLoad[["Week load penalty:<br/>IF week > 8: -20<br/>ELSE IF week > 6: -10"]]
+    ScoreWeekLoad --> ScoreSubject[["Subject clustering penalty:<br/>Find same subject within 3 days<br/>-8 per nearby assignment"]]
+
+    ScoreSubject --> FinalScore[["Final Score:<br/>MAX(0, roundedScore)"]]
+
+    FinalScore --> GoodScore{Score > 60?}
+
+    GoodScore -->|Yes| AddToAlternatives[["ADD to alternatives:<br/>Store date, score,<br/>day name, reason"]]
+    GoodScore -->|No| NextIteration
+
+    AddToAlternatives --> NextIteration[Continue Loop]
+
+    NextIteration --> MoreDates{More dates<br/>to check?}
+
+    MoreDates -->|Yes| LoopDates
+    MoreDates -->|No| SortAlternatives[["SORT alternatives by<br/>score (descending)<br/>TAKE top 3"]]
+
+    SortAlternatives --> GenAltSuggestions[["Generate Suggestions:<br/>⭐ BEST (1st)<br/>💡 GOOD (2nd)<br/>💡 ALTERNATIVE (3rd)"]]
+
+    GenAltSuggestions --> DisplaySuggestions[["Display All Suggestions:<br/>- Main assessment<br/>- Weekly analysis<br/>- Weekend warnings<br/>- AI alternatives<br/>with badges and icons"]]
+
+    DisplaySuggestions --> ShowPanel[Display Suggestions Panel<br/>with color-coded badges]
+
+    ShowPanel --> End([Teacher Reviews<br/>Suggestions])
+
+    subgraph "Date Scoring Algorithm"
+        ScoreStart[Start: 100 points]
+        ScorePenalties[["Apply Penalties:<br/>- Existing assignments: -15 each<br/>- Weekend (Sat/Sun): -30<br/>- Friday: -10<br/>- Monday: -5<br/>- Week overload (>8): -20<br/>- Week heavy (>6): -10<br/>- Same subject nearby: -8 each"]]
+        ScoreResult[Result: 0-100 score]
+
+        ScoreStart --> ScorePenalties --> ScoreResult
+    end
+
+    classDef input fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef critical fill:#fed7d7,stroke:#c53030,color:#2d3748
+    classDef warning fill:#fef7de,stroke:#d69e2e,color:#2d3748
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef algorithm fill:#e8f4fd,stroke:#667eea,color:#2d3748
+
+    class GetInput,ParseDate input
+    class FilterAssignments,CheckDesiredDate,CheckWeek,FindAlternatives,LoopDates,AddDaysCalc,ScoreDate,ScoreAssignments,ScoreWeekend,ScoreWeekLoad,ScoreSubject,FinalScore,AddToAlternatives,SortAlternatives,GenAltSuggestions process
+    class CalculateStress,WeekCheck,CheckWeekend,CheckStressForAlternatives,SkipPast,GoodScore,MoreDates decision
+    class CriticalStress,GenCritical,WeekOverload critical
+    class HighStress,GenHigh,ModerateStress,GenModerate,WeekHeavy,WeekendWarning warning
+    class LowStress,GenLow,WeekOK success
+    class ScoreStart,ScorePenalties,ScoreResult algorithm
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Code Management -->
+        <div class="section">
+            <h2 class="section-title">3. Class Code Management</h2>
+            <div class="flowchart-container">
+                <div class="mermaid">
+graph TB
+    Start([Teacher Portal Loads]) --> LoadClasses[["loadTeacherClasses():<br/>READ 'teacher-classes'<br/>from localStorage"]]
+
+    LoadClasses --> ParseClasses[["PARSE JSON array<br/>of class objects"]]
+
+    ParseClasses --> UpdateSelector[["updateClassSelector():<br/>Populate dropdown with:<br/>- 'All My Classes'<br/>- Each class name"]]
+
+    UpdateSelector --> RenderList[["renderClassList():<br/>Display class codes<br/>in management modal"]]
+
+    RenderList --> TeacherView[Teacher Dashboard Display]
+
+    TeacherView --> ClassAction{Teacher Action?}
+
+    ClassAction -->|Click 'My Classes'| OpenModal[Open Class Modal]
+    OpenModal --> ModalDisplay[["Display:<br/>- Input for class name<br/>- List of existing codes<br/>- Copy/Delete buttons"]]
+
+    ModalDisplay --> TeacherInput{Teacher Input?}
+
+    TeacherInput -->|Enter Class Name| GetClassName[["GET className<br/>from input field"]]
+    GetClassName --> ClickGenerate{Click 'Generate'?}
+
+    ClickGenerate -->|Yes| ValidateName{Class name<br/>not empty?}
+
+    ValidateName -->|No| ShowAlert[Alert: 'Please enter<br/>a class name']
+    ShowAlert --> ModalDisplay
+
+    ValidateName -->|Yes| GenerateCode[["Generate unique code:<br/>1. REMOVE spaces from name<br/>2. CONVERT to uppercase<br/>3. GENERATE random string (6 chars)<br/>4. FORMAT: NAME-RANDOM"]]
+
+    GenerateCode --> ExampleCode[["Example:<br/>Input: '10A Mathematics'<br/>Output: '10A-MATHEMATICS-A3F9K2'"]]
+
+    ExampleCode --> CreateClassObject[["CREATE class object:<br/>code = generated<br/>name = className<br/>createdAt = now (ISO)"]]
+
+    CreateClassObject --> AddToArray[["ADD to teacherClasses<br/>array"]]
+
+    AddToArray --> SaveClasses[["SAVE to localStorage<br/>key: 'teacher-classes'<br/>value: JSON array"]]
+
+    SaveClasses --> ClearInput[Clear input field]
+
+    ClearInput --> ReloadClasses[["CALL loadTeacherClasses():<br/>Refresh selector & list"]]
+
+    ReloadClasses --> ModalDisplay
+
+    TeacherInput -->|Click 'Copy'| GetCode[Get class code<br/>to copy]
+    GetCode --> TryCopy{Clipboard API<br/>available?}
+
+    TryCopy -->|Yes| CopyToClipboard[["navigator.clipboard<br/>.writeText(code)"]]
+    TryCopy -->|No| FallbackCopy[["Fallback method:<br/>CREATE textarea<br/>SELECT text<br/>COPY command<br/>REMOVE textarea"]]
+
+    CopyToClipboard --> ShowCopySuccess[Alert: 'Code copied<br/>to clipboard']
+    FallbackCopy --> ShowCopySuccess
+
+    ShowCopySuccess --> ModalDisplay
+
+    TeacherInput -->|Click 'Delete'| ConfirmDelete[Confirm Dialog:<br/>'Delete this class code?']
+
+    ConfirmDelete -->|Cancelled| ModalDisplay
+
+    ConfirmDelete -->|Confirmed| RemoveFromArray[["FILTER teacherClasses<br/>Remove code entry"]]
+
+    RemoveFromArray --> SaveAfterDelete[["SAVE updated array<br/>to localStorage"]]
+
+    SaveAfterDelete --> ReloadAfterDelete[["CALL loadTeacherClasses():<br/>Refresh UI"]]
+
+    ReloadAfterDelete --> CheckSelected{Was deleted code<br/>currently selected?}
+
+    CheckSelected -->|Yes| ResetSelector[["SET selector to 'all'<br/>CALL renderAll()"]]
+    CheckSelected -->|No| ModalDisplay
+
+    ResetSelector --> ModalDisplay
+
+    TeacherInput -->|Click 'X' or Outside| CloseModal[Close Class Modal]
+    CloseModal --> TeacherView
+
+    ClassAction -->|Select Class| ClassChange[["onChange event:<br/>GET selected value"]]
+
+    ClassChange --> UpdateSelected[["UPDATE selectedClass<br/>variable"]]
+
+    UpdateSelected --> FilterData[["CALL renderAll():<br/>Re-render with filter"]]
+
+    FilterData --> ApplyFilter[["getFilteredAssignments():<br/>IF 'all':<br/>  Show all teacher's classes<br/>ELSE:<br/>  Show specific class only"]]
+
+    ApplyFilter --> ShowFiltered[Display Filtered Data:<br/>- Calendar<br/>- Statistics<br/>- Insights]
+
+    ShowFiltered --> TeacherView
+
+    StudentStart([Student Adds Assignment]) --> StudentForm[Assignment Form<br/>with Class Code field]
+
+    StudentForm --> StudentEnters[["Student ENTERS:<br/>Class code from teacher"]]
+
+    StudentEnters --> UpperCase[["Convert to UPPERCASE<br/>before saving"]]
+
+    UpperCase --> SaveAssignment[["SAVE assignment with:<br/>classCode field"]]
+
+    SaveAssignment --> TeacherCanSee{Teacher owns<br/>this class code?}
+
+    TeacherCanSee -->|Yes| VisibleToTeacher[Assignment visible<br/>in teacher portal]
+    TeacherCanSee -->|No| NotVisible[Assignment NOT visible<br/>to teacher]
+
+    VisibleToTeacher --> FilterMatch[["getFilteredAssignments()<br/>matches class code"]]
+    NotVisible --> NoMatch[Not in teacher's<br/>class code list]
+
+    FilterMatch --> TeacherView
+    NoMatch --> End([Assignment stored<br/>but isolated])
+
+    subgraph "localStorage Structure"
+        Storage1[["'teacher-classes': [<br/>  {<br/>    code: 'CLASS-ABC123',<br/>    name: '10A Math',<br/>    createdAt: '2024-...'<br/>  }<br/>]"]]
+        Storage2[["'student-assignments': [<br/>  {<br/>    id: 12345,<br/>    classCode: 'CLASS-ABC123',<br/>    ...<br/>  }<br/>]"]]
+    end
+
+    SaveClasses -.->|Write| Storage1
+    SaveAfterDelete -.->|Update| Storage1
+    LoadClasses -.->|Read| Storage1
+    SaveAssignment -.->|Write| Storage2
+    ApplyFilter -.->|Read| Storage1
+    ApplyFilter -.->|Read| Storage2
+
+    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+
+    class LoadClasses,ParseClasses,UpdateSelector,RenderList,OpenModal,ModalDisplay,GenerateCode,CreateClassObject,AddToArray,SaveClasses,ReloadClasses,RemoveFromArray,SaveAfterDelete,ReloadAfterDelete,ResetSelector,ClassChange,UpdateSelected,FilterData,ApplyFilter teacher
+    class StudentStart,StudentForm,StudentEnters,UpperCase,SaveAssignment student
+    class GetClassName,GetCode,CopyToClipboard,FallbackCopy,ClearInput process
+    class Storage1,Storage2 storage
+    class ClassAction,TeacherInput,ClickGenerate,ValidateName,TryCopy,ConfirmDelete,CheckSelected,TeacherCanSee decision
+    class ShowCopySuccess,VisibleToTeacher,FilterMatch success
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Assignment -->
+        <div class="section">
+            <h2 class="section-title">4. Edit Assignment Feature</h2>
+            <div class="flowchart-container">
+                <div class="mermaid">
+graph TB
+    Start([Student Portal<br/>Assignment List]) --> DisplayList[["Display All Assignments<br/>with Edit & Delete buttons"]]
+
+    DisplayList --> UserAction{User Action?}
+
+    UserAction -->|Click 'Edit'| GetID[["GET assignment ID<br/>from button click"]]
+
+    GetID --> FindAssignment[["FIND assignment<br/>in assignments array<br/>where id matches"]]
+
+    FindAssignment --> AssignmentFound{Assignment<br/>found?}
+
+    AssignmentFound -->|No| ErrorReturn[Return to list]
+    ErrorReturn --> DisplayList
+
+    AssignmentFound -->|Yes| PopulateModal[["Populate Edit Modal:<br/>SET edit-subject = a.subject<br/>SET edit-assignment = a.assignment<br/>SET edit-due-date = a.dueDate<br/>SET edit-class-code = a.classCode<br/>SET edit-description = a.description<br/>SET edit-assignment-id = a.id - hidden field"]]
+
+    PopulateModal --> ShowModal[Display Edit Modal<br/>with pre-filled form]
+
+    ShowModal --> ModalAction{User Action<br/>in Modal?}
+
+    ModalAction -->|Click 'X' or Outside| CloseNoSave[Close Edit Modal]
+    CloseNoSave --> DisplayList
+
+    ModalAction -->|Modify Fields| EditFields[["User EDITS:<br/>- Subject<br/>- Assignment Title<br/>- Due Date<br/>- Class Code<br/>- Description"]]
+
+    EditFields --> ModalAction
+
+    ModalAction -->|Click 'Save Changes'| SubmitForm[Submit Edit Form]
+
+    SubmitForm --> GetUpdatedData[["READ form values:<br/>subject = edit-subject<br/>assignment = edit-assignment<br/>dueDate = edit-due-date<br/>classCode = edit-class-code<br/>description = edit-description<br/>id = edit-assignment-id"]]
+
+    GetUpdatedData --> FindIndex[["FIND assignment index<br/>in assignments array<br/>where id matches"]]
+
+    FindIndex --> IndexFound{Index found<br/>and valid?}
+
+    IndexFound -->|No| ShowError[Show error message]
+    ShowError --> ShowModal
+
+    IndexFound -->|Yes| UpdateAssignment[["UPDATE assignment at index:<br/>Copy existing data,<br/>Update fields:<br/>subject: trimmed value<br/>assignment: trimmed value<br/>dueDate: new value<br/>classCode: uppercase<br/>description: trimmed value"]]
+
+    UpdateAssignment --> PreserveData[["PRESERVE original data:<br/>- id: keep original<br/>- dateAdded: keep original<br/>- Update only edited fields"]]
+
+    PreserveData --> SaveToStorage[["SAVE to localStorage:<br/>key: 'student-assignments'<br/>value: updated JSON array"]]
+
+    SaveToStorage --> RenderAll[["CALL renderAll():<br/>Refresh all views"]]
+
+    RenderAll --> UpdateViews[["Update displays:<br/>- Statistics<br/>- Upcoming assignments<br/>- Calendar<br/>- All assignments list"]]
+
+    UpdateViews --> CloseModal[Close Edit Modal]
+
+    CloseModal --> ShowSuccess[Display Success Alert<br/>✅ 3 seconds]
+
+    ShowSuccess --> DisplayList
+
+    UserAction -->|Click 'Delete'| ConfirmDelete[Confirm Dialog:<br/>'Delete this assignment?']
+
+    ConfirmDelete -->|Cancelled| DisplayList
+
+    ConfirmDelete -->|Confirmed| DeleteAssignment[["FILTER assignments array:<br/>Remove assignment<br/>where id matches"]]
+
+    DeleteAssignment --> SaveAfterDelete[["SAVE to localStorage:<br/>Updated array"]]
+
+    SaveAfterDelete --> RenderAfterDelete[["CALL renderAll():<br/>Refresh all views"]]
+
+    RenderAfterDelete --> DisplayList
+
+    UpdateViews --> CheckCalendar{Date changed?}
+
+    CheckCalendar -->|Yes| UpdateCalendar[["Calendar re-renders:<br/>- Remove from old date<br/>- Add to new date<br/>- Update stress levels"]]
+    CheckCalendar -->|No| CalendarUnchanged[Calendar shows<br/>updated details]
+
+    UpdateCalendar --> CalendarReflect
+    CalendarUnchanged --> CalendarReflect[Assignment visible<br/>on calendar]
+
+    CalendarReflect --> TeacherView{Teacher has<br/>this class code?}
+
+    TeacherView -->|Yes| TeacherSees[["Teacher portal shows:<br/>Updated assignment<br/>on new date"]]
+    TeacherView -->|No| TeacherNoSee[Not visible<br/>to teacher]
+
+    TeacherSees --> Complete
+    TeacherNoSee --> Complete([Edit Complete])
+
+    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef modal fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#e8f4fd,stroke:#667eea,color:#2d3748
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef error fill:#fed7d7,stroke:#c53030,color:#2d3748
+
+    class DisplayList,GetID,FindAssignment,FindIndex,UpdateAssignment,PreserveData,SaveToStorage,RenderAll,UpdateViews,DeleteAssignment,SaveAfterDelete,RenderAfterDelete student
+    class GetUpdatedData,EditFields,UpdateCalendar process
+    class PopulateModal,ShowModal,CloseModal,CloseNoSave modal
+    class SaveToStorage,SaveAfterDelete storage
+    class UserAction,AssignmentFound,ModalAction,IndexFound,ConfirmDelete,CheckCalendar,TeacherView decision
+    class ShowSuccess,TeacherSees,CalendarReflect success
+    class ShowError,ErrorReturn error
+                </div>
+            </div>
+        </div>
+
+        <!-- Timezone-Safe Date Handling -->
+        <div class="section">
+            <h2 class="section-title">5. Timezone-Safe Date Handling</h2>
+            <div class="flowchart-container">
+                <div class="mermaid">
+graph TB
+    Start([Date Operations Needed]) --> Problem[["THE PROBLEM:<br/>Central Australian Time<br/>UTC+9:30 (Standard)<br/>UTC+10:30 (Daylight)"]]
+
+    Problem --> OldWay[["❌ OLD WAY (Broken):<br/>new Date('2024-10-17')<br/>→ Interprets as UTC midnight<br/>→ Converts to local time<br/>→ Shows 2024-10-18 ⚠️"]]
+
+    OldWay --> Solution[["✅ SOLUTION:<br/>Use helper functions<br/>that work in LOCAL timezone"]]
+
+    Solution --> HelperFunctions{Which Helper<br/>Function?}
+
+    HelperFunctions -->|Parse string to Date| ParseLocal[["parseLocalDate(dateString)<br/>Input: '2024-10-17'"]]
+
+    ParseLocal --> SplitString[["SPLIT string by '-'<br/>Result: ['2024', '10', '17']"]]
+
+    SplitString --> ConvertNumbers[["MAP to numbers:<br/>[2024, 10, 17]"]]
+
+    ConvertNumbers --> Extract[["EXTRACT components:<br/>year = 2024<br/>month = 10<br/>day = 17"]]
+
+    Extract --> CreateLocal[["CREATE Date in LOCAL timezone:<br/>new Date(year, month-1, day)<br/>Note: month-1 because<br/>JS months are 0-indexed"]]
+
+    CreateLocal --> ReturnDate[["RETURN Date object:<br/>2024-10-17 00:00:00<br/>in LOCAL timezone ✓"]]
+
+    ReturnDate --> UseCase1
+
+    HelperFunctions -->|Convert Date to string| DateToString[["dateToLocalString(date)<br/>Input: Date object"]]
+
+    DateToString --> GetComponents[["GET local components:<br/>year = date.getFullYear()<br/>month = date.getMonth()<br/>day = date.getDate()"]]
+
+    GetComponents --> CallFormat[["CALL formatDateLocal(<br/>  year, month, day<br/>)"]]
+
+    CallFormat --> UseCase2
+
+    HelperFunctions -->|Format components| FormatLocal[["formatDateLocal(year, month, day)<br/>Input: numbers"]]
+
+    FormatLocal --> ConvertStrings[["CONVERT to strings:<br/>y = year.toString()<br/>m = (month+1).toString()<br/>d = day.toString()"]]
+
+    ConvertStrings --> PadZeros[["PAD with zeros:<br/>m = m.padStart(2, '0')<br/>d = d.padStart(2, '0')"]]
+
+    PadZeros --> BuildString[["BUILD string:<br/>`${y}-${m}-${d}`"]]
+
+    BuildString --> ReturnString[["RETURN string:<br/>'2024-10-17' ✓"]]
+
+    ReturnString --> UseCase2
+
+    HelperFunctions -->|Add days to date| AddDays[["addDays(dateString, days)<br/>Input: '2024-10-17', 7"]]
+
+    AddDays --> ParseInput[["CALL parseLocalDate(<br/>  dateString<br/>)"]]
+
+    ParseInput --> CheckNull1{Date valid?}
+
+    CheckNull1 -->|No| ReturnNull1[RETURN null]
+    CheckNull1 -->|Yes| AddDaysCalc[["date.setDate(<br/>  date.getDate() + days<br/>)"]]
+
+    AddDaysCalc --> ConvertBack1[["CALL dateToLocalString(<br/>  date<br/>)"]]
+
+    ConvertBack1 --> ReturnNew[["RETURN new date string:<br/>'2024-10-24' ✓"]]
+
+    ReturnNew --> UseCase3
+
+    HelperFunctions -->|Get day of week| GetDay[["getDayOfWeek(dateString)<br/>Input: '2024-10-17'"]]
+
+    GetDay --> ParseInput2[["CALL parseLocalDate(<br/>  dateString<br/>)"]]
+
+    ParseInput2 --> CheckNull2{Date valid?}
+
+    CheckNull2 -->|No| ReturnNull2[RETURN null]
+    CheckNull2 -->|Yes| GetDayNum[["CALL date.getDay()<br/>Returns: 0-6<br/>(0=Sunday, 6=Saturday)"]]
+
+    GetDayNum --> ReturnDay[["RETURN day number:<br/>4 (Thursday) ✓"]]
+
+    ReturnDay --> UseCase4
+
+    UseCase1[["USE CASE 1:<br/>Student enters due date<br/>in form"]]
+    UseCase1 --> UC1Input[["Form input value:<br/>'2024-10-17'"]]
+    UC1Input --> UC1Parse[["CALL parseLocalDate()<br/>to create Date object"]]
+    UC1Parse --> UC1Calc[["Calculate days until due:<br/>Compare with today"]]
+    UC1Calc --> UC1Display[["Display badge:<br/>'3 days left' ✓"]]
+
+    UseCase2[["USE CASE 2:<br/>Render calendar day"]]
+    UseCase2 --> UC2Loop[["Loop through month days:<br/>day = 1 to 31"]]
+    UC2Loop --> UC2Format[["CALL formatDateLocal(<br/>  year, month, day<br/>)"]]
+    UC2Format --> UC2Compare[["Compare with assignment dates:<br/>'2024-10-17' === '2024-10-17' ✓"]]
+    UC2Compare --> UC2Display[["Display on correct day<br/>No date shift! ✓"]]
+
+    UseCase3[["USE CASE 3:<br/>Find alternative dates<br/>for AI suggestions"]]
+    UseCase3 --> UC3Target[["Target date:<br/>'2024-10-17'"]]
+    UC3Target --> UC3Loop[["Loop: i = -7 to +21"]]
+    UC3Loop --> UC3Add[["CALL addDays(<br/>  '2024-10-17', i<br/>)"]]
+    UC3Add --> UC3Result[["Get alternative:<br/>'2024-10-24' ✓"]]
+
+    UseCase4[["USE CASE 4:<br/>Check for weekend<br/>assignments"]]
+    UseCase4 --> UC4Check[["FOR each assignment:<br/>dueDate = '2024-10-20'"]]
+    UC4Check --> UC4GetDay[["CALL getDayOfWeek(<br/>  '2024-10-20'<br/>)"]]
+    UC4GetDay --> UC4Compare[["IF day === 0 OR day === 6:<br/>It's a weekend"]]
+    UC4Compare --> UC4Warning[["Generate warning:<br/>'Weekend assignment' ⚠️"]]
+
+    UC1Display --> End
+    UC2Display --> End
+    UC3Result --> End
+    UC4Warning --> End
+    ReturnNull1 --> End
+    ReturnNull2 --> End
+
+    End([Dates Work Correctly<br/>in All Timezones ✓])
+
+    classDef helper fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef wrong fill:#fed7d7,stroke:#c53030,color:#2d3748
+    classDef right fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef example fill:#fef7de,stroke:#d69e2e,color:#2d3748
+
+    class ParseLocal,DateToString,FormatLocal,AddDays,GetDay helper
+    class SplitString,ConvertNumbers,Extract,CreateLocal,GetComponents,CallFormat,ConvertStrings,PadZeros,BuildString,ParseInput,AddDaysCalc,ConvertBack1,ParseInput2,GetDayNum process
+    class OldWay wrong
+    class Solution,ReturnDate,ReturnString,ReturnNew,ReturnDay,UC1Display,UC2Display,UC3Result,UC4Warning right
+    class HelperFunctions,CheckNull1,CheckNull2 decision
+    class UC1Input,UC1Parse,UC1Calc,UC2Loop,UC2Format,UC2Compare,UC3Target,UC3Loop,UC3Add,UC4Check,UC4GetDay,UC4Compare example
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Assignment Stress Radar - Version 2</strong></p>
+            <p>Enhanced with AI and Authentication</p>
+            <p>St Philip's College - 2024</p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+graph TB
+    Start([Assignment Stress Radar<br/>Landing Page]) --> Choice{User Type?}
+    
+    %% Student Portal Flow
+    Choice -->|Student| SP[Student Portal<br/>📚]
+    SP --> SPLoad[["On Page Load:<br/>SET min date to today<br/>CALL renderAll()"]]
+    
+    SPLoad --> SPDash[Student Dashboard]
+    SPDash --> SPStats[["updateStats():<br/>CALCULATE total assignments<br/>COUNT unique subjects<br/>IF thisWeek >= 5: 'High'<br/>ELSE IF >= 3: 'Medium'<br/>ELSE: 'Low'"]]
+    
+    SPDash --> SPForm{Add Assignment?}
+    SPForm -->|Yes| SPInput[["GET subject<br/>GET assignment title<br/>GET due date<br/>GET description"]]
+    SPInput --> SPCreate[["CREATE assignment object:<br/>id = timestamp<br/>subject = input<br/>dueDate = input<br/>dateAdded = current"]]
+    SPCreate --> SPSave[["ADD to array<br/>SAVE to localStorage<br/>CALL renderAll()"]]
+    SPSave --> SPSuccess[Show Success Message<br/>✅ 3 seconds]
+    SPSuccess --> SPRender
+    
+    SPForm -->|No| SPView[View Assignments]
+    SPView --> SPRender[["renderAssignments():<br/>SORT by due date<br/>FOR EACH assignment:<br/>  CALCULATE days until due<br/>  SET badge color/text<br/>  DISPLAY card"]]
+    
+    SPRender --> SPUpcoming[["renderUpcoming():<br/>FILTER next 7 days<br/>IF days <= 1: high priority<br/>ELSE IF <= 3: medium<br/>ELSE: low"]]
+    
+    SPUpcoming --> SPDelete{Delete Assignment?}
+    SPDelete -->|Yes| SPConfirm[Confirm Dialog]
+    SPConfirm -->|Confirmed| SPRemove[["REMOVE from array<br/>UPDATE localStorage<br/>CALL renderAll()"]]
+    SPRemove --> SPDash
+    SPDelete -->|No| SPDash
+    
+    %% Teacher Dashboard Flow
+    Choice -->|Teacher| TD[Teacher Dashboard<br/>👩‍🏫]
+    TD --> TDLoad[["On Page Load:<br/>LOAD studentAssignments<br/>START auto-refresh (5s)<br/>CALL renderAll()"]]
+    
+    TDLoad --> TDDash[Teacher Dashboard View]
+    TDDash --> TDStats[["updateStats():<br/>COUNT total assignments<br/>COUNT stress days (4+)<br/>COUNT weekend assignments<br/>CALCULATE balance score"]]
+    
+    TDStats --> TDCal[["renderCalendar():<br/>FOR day 1 to lastDay:<br/>  COUNT assignments<br/>  CALCULATE stress level:<br/>    <= 1: Green (0)<br/>    <= 3: Yellow (1)<br/>    <= 5: Orange (2)<br/>    >= 6: Red (3)"]]
+    
+    TDCal --> TDHeatmap[Display Workload Heatmap]
+    TDHeatmap --> TDNav{Navigate Month?}
+    TDNav -->|Yes| TDChange[["changeMonth(direction):<br/>ADD direction to month<br/>IF > 11: next year<br/>IF < 0: prev year<br/>CALL renderAll()"]]
+    TDChange --> TDCal
+    
+    TDNav -->|No| TDClick{Click Day?}
+    TDClick -->|Yes| TDModal[["showDayDetails():<br/>OPEN modal<br/>GET assignments for date<br/>CALCULATE stress level<br/>DISPLAY details"]]
+    TDModal --> TDClose[Close Modal]
+    TDClose --> TDHeatmap
+    
+    TDClick -->|No| TDInsights[["generateInsights():<br/>IF no data: show empty<br/>CHECK critical days (4+)<br/>CHECK subject imbalance<br/>CHECK weekend assignments<br/>GENERATE recommendations"]]
+    
+    TDInsights --> TDAnalysis[Display Workload Analysis]
+    TDAnalysis --> TDTypes{Insight Types}
+    
+    TDTypes --> TDDanger[["Type: DANGER (Red)<br/>Critical Workload Alert<br/>X days have 4+ assignments<br/>Redistribute assignments"]]
+    TDTypes --> TDWarning[["Type: WARNING (Orange)<br/>Subject Imbalance or<br/>Weekend Assignments<br/>Coordinate with teachers"]]
+    TDTypes --> TDSuccess[["Type: SUCCESS (Green)<br/>Excellent Management<br/>Balanced distribution<br/>Continue practices"]]
+    
+    TDDanger --> TDRefresh
+    TDWarning --> TDRefresh
+    TDSuccess --> TDRefresh
+    
+    TDRefresh[["Auto-Refresh (5s):<br/>RELOAD from localStorage<br/>CALL renderAll()"]]
+    TDRefresh --> TDDash
+    
+    %% Data Storage
+    SPSave -.->|Write| Storage[(localStorage<br/>'student-assignments'<br/>JSON Array)]
+    SPRemove -.->|Update| Storage
+    Storage -.->|Read| SPLoad
+    Storage -.->|Read| TDLoad
+    Storage -.->|Read Every 5s| TDRefresh
+    
+    %% Stress Level Algorithm
+    subgraph "Stress Level Algorithm"
+        SLInput[Assignment Count]
+        SLCalc{Count Check}
+        SLInput --> SLCalc
+        SLCalc -->|"<= 1"| SL0[Level 0: Low<br/>Green]
+        SLCalc -->|"2-3"| SL1[Level 1: Moderate<br/>Yellow]
+        SLCalc -->|"4-5"| SL2[Level 2: High<br/>Orange]
+        SLCalc -->|">= 6"| SL3[Level 3: Critical<br/>Red]
+    end
+    
+    %% Styling
+    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef alert fill:#fed7d7,stroke:#c53030,color:#2d3748
+    
+    class SP,SPDash,SPForm,SPInput,SPCreate,SPSave,SPRender,SPUpcoming student
+    class TD,TDDash,TDCal,TDHeatmap,TDModal,TDAnalysis teacher
+    class SPLoad,TDLoad,SPStats,TDStats,TDInsights,TDRefresh process
+    class Storage storage
+    class Choice,SPDelete,TDNav,TDClick,TDTypes,SLCalc decision
+    class TDDanger,SPConfirm alert

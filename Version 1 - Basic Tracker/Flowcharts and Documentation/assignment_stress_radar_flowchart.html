@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Stress Radar - System Flowchart</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-box {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+        
+        .student-color {
+            background: #667eea;
+            border-color: #5a67d8;
+        }
+        
+        .teacher-color {
+            background: #e53e3e;
+            border-color: #c53030;
+        }
+        
+        .process-color {
+            background: #38a169;
+            border-color: #2f855a;
+        }
+        
+        .storage-color {
+            background: #d69e2e;
+            border-color: #b7791f;
+        }
+        
+        .decision-color {
+            background: #764ba2;
+            border-color: #553c9a;
+        }
+        
+        .flowchart-container {
+            padding: 30px;
+            background: white;
+            overflow-x: auto;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            min-height: 800px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8fafc;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: #1a202c;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        .info-card.teacher {
+            border-left-color: #e53e3e;
+        }
+        
+        .info-card.data {
+            border-left-color: #d69e2e;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #4ade80;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .legend {
+                gap: 15px;
+            }
+            
+            .flowchart-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Assignment Stress Radar</h1>
+            <p>System Architecture & Flow Diagram</p>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box student-color"></div>
+                <span><strong>Student Portal</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box teacher-color"></div>
+                <span><strong>Teacher Dashboard</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box process-color"></div>
+                <span><strong>Process/Function</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box storage-color"></div>
+                <span><strong>Data Storage</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box decision-color"></div>
+                <span><strong>Decision Point</strong></span>
+            </div>
+        </div>
+        
+        <div class="flowchart-container">
+            <div class="mermaid">
+                graph TB
+                    Start([Assignment Stress Radar<br/>Landing Page]) --> Choice{User Type?}
+                    
+                    %% Student Portal Flow
+                    Choice -->|Student| SP[Student Portal<br/>📚]
+                    SP --> SPLoad[["On Page Load:<br/>SET min date to today<br/>CALL renderAll()"]]
+                    
+                    SPLoad --> SPDash[Student Dashboard]
+                    SPDash --> SPStats[["updateStats():<br/>CALCULATE total assignments<br/>COUNT unique subjects<br/>IF thisWeek >= 5: 'High'<br/>ELSE IF >= 3: 'Medium'<br/>ELSE: 'Low'"]]
+                    
+                    SPDash --> SPForm{Add Assignment?}
+                    SPForm -->|Yes| SPInput[["GET subject<br/>GET assignment title<br/>GET due date<br/>GET description"]]
+                    SPInput --> SPCreate[["CREATE assignment object:<br/>id = timestamp<br/>subject = input<br/>dueDate = input<br/>dateAdded = current"]]
+                    SPCreate --> SPSave[["ADD to array<br/>SAVE to localStorage<br/>CALL renderAll()"]]
+                    SPSave --> SPSuccess[Show Success Message<br/>✅ 3 seconds]
+                    SPSuccess --> SPRender
+                    
+                    SPForm -->|No| SPView[View Assignments]
+                    SPView --> SPRender[["renderAssignments():<br/>SORT by due date<br/>FOR EACH assignment:<br/>  CALCULATE days until due<br/>  SET badge color/text<br/>  DISPLAY card"]]
+                    
+                    SPRender --> SPUpcoming[["renderUpcoming():<br/>FILTER next 7 days<br/>IF days <= 1: high priority<br/>ELSE IF <= 3: medium<br/>ELSE: low"]]
+                    
+                    SPUpcoming --> SPDelete{Delete Assignment?}
+                    SPDelete -->|Yes| SPConfirm[Confirm Dialog]
+                    SPConfirm -->|Confirmed| SPRemove[["REMOVE from array<br/>UPDATE localStorage<br/>CALL renderAll()"]]
+                    SPRemove --> SPDash
+                    SPDelete -->|No| SPDash
+                    
+                    %% Teacher Dashboard Flow
+                    Choice -->|Teacher| TD[Teacher Dashboard<br/>👩‍🏫]
+                    TD --> TDLoad[["On Page Load:<br/>LOAD studentAssignments<br/>START auto-refresh (5s)<br/>CALL renderAll()"]]
+                    
+                    TDLoad --> TDDash[Teacher Dashboard View]
+                    TDDash --> TDStats[["updateStats():<br/>COUNT total assignments<br/>COUNT stress days (4+)<br/>COUNT weekend assignments<br/>CALCULATE balance score"]]
+                    
+                    TDStats --> TDCal[["renderCalendar():<br/>FOR day 1 to lastDay:<br/>  COUNT assignments<br/>  CALCULATE stress level:<br/>    <= 1: Green (0)<br/>    <= 3: Yellow (1)<br/>    <= 5: Orange (2)<br/>    >= 6: Red (3)"]]
+                    
+                    TDCal --> TDHeatmap[Display Workload Heatmap]
+                    TDHeatmap --> TDNav{Navigate Month?}
+                    TDNav -->|Yes| TDChange[["changeMonth(direction):<br/>ADD direction to month<br/>IF > 11: next year<br/>IF < 0: prev year<br/>CALL renderAll()"]]
+                    TDChange --> TDCal
+                    
+                    TDNav -->|No| TDClick{Click Day?}
+                    TDClick -->|Yes| TDModal[["showDayDetails():<br/>OPEN modal<br/>GET assignments for date<br/>CALCULATE stress level<br/>DISPLAY details"]]
+                    TDModal --> TDClose[Close Modal]
+                    TDClose --> TDHeatmap
+                    
+                    TDClick -->|No| TDInsights[["generateInsights():<br/>IF no data: show empty<br/>CHECK critical days (4+)<br/>CHECK subject imbalance<br/>CHECK weekend assignments<br/>GENERATE recommendations"]]
+                    
+                    TDInsights --> TDAnalysis[Display Workload Analysis]
+                    TDAnalysis --> TDTypes{Insight Types}
+                    
+                    TDTypes --> TDDanger[["Type: DANGER (Red)<br/>Critical Workload Alert<br/>X days have 4+ assignments<br/>Redistribute assignments"]]
+                    TDTypes --> TDWarning[["Type: WARNING (Orange)<br/>Subject Imbalance or<br/>Weekend Assignments<br/>Coordinate with teachers"]]
+                    TDTypes --> TDSuccess[["Type: SUCCESS (Green)<br/>Excellent Management<br/>Balanced distribution<br/>Continue practices"]]
+                    
+                    TDDanger --> TDRefresh
+                    TDWarning --> TDRefresh
+                    TDSuccess --> TDRefresh
+                    
+                    TDRefresh[["Auto-Refresh (5s):<br/>RELOAD from localStorage<br/>CALL renderAll()"]]
+                    TDRefresh --> TDDash
+                    
+                    %% Data Storage
+                    SPSave -.->|Write| Storage[(localStorage<br/>'student-assignments'<br/>JSON Array)]
+                    SPRemove -.->|Update| Storage
+                    Storage -.->|Read| SPLoad
+                    Storage -.->|Read| TDLoad
+                    Storage -.->|Read Every 5s| TDRefresh
+                    
+                    %% Styling
+                    classDef student fill:#667eea,stroke:#5a67d8,color:#fff
+                    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+                    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+                    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+                    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+                    classDef alert fill:#fed7d7,stroke:#c53030,color:#2d3748
+                    
+                    class SP,SPDash,SPForm,SPInput,SPCreate,SPSave,SPRender,SPUpcoming student
+                    class TD,TDDash,TDCal,TDHeatmap,TDModal,TDAnalysis teacher
+                    class SPLoad,TDLoad,SPStats,TDStats,TDInsights,TDRefresh process
+                    class Storage storage
+                    class Choice,SPDelete,TDNav,TDClick,TDTypes,SLCalc decision
+                    class TDDanger,SPConfirm alert
+            </div>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>📚 Student Portal Flow</h3>
+                <p>Students can add assignments, track stress levels, and manage their workload. The system automatically calculates stress based on weekly assignment count.</p>
+                <div class="code-snippet">
+                    IF thisWeek >= 5: stress = "High"<br/>
+                    ELSE IF thisWeek >= 3: stress = "Medium"<br/>
+                    ELSE: stress = "Low"
+                </div>
+            </div>
+            
+            <div class="info-card teacher">
+                <h3>👩‍🏫 Teacher Dashboard Flow</h3>
+                <p>Teachers view real-time workload heatmaps and receive AI-powered insights. The system auto-refreshes every 5 seconds to show latest student data.</p>
+                <div class="code-snippet">
+                    CALCULATE stress level:<br/>
+                    &nbsp;&nbsp;<= 1: Green (Low)<br/>
+                    &nbsp;&nbsp;<= 3: Yellow (Moderate)<br/>
+                    &nbsp;&nbsp;<= 5: Orange (High)<br/>
+                    &nbsp;&nbsp;>= 6: Red (Critical)
+                </div>
+            </div>
+            
+            <div class="info-card data">
+                <h3>💾 Data Storage</h3>
+                <p>All data is stored locally in browser localStorage as JSON arrays. This ensures privacy and enables real-time synchronization between student and teacher views.</p>
+                <div class="code-snippet">
+                    localStorage['student-assignments'] = {<br/>
+                    &nbsp;&nbsp;id: timestamp,<br/>
+                    &nbsp;&nbsp;subject: string,<br/>
+                    &nbsp;&nbsp;assignment: string,<br/>
+                    &nbsp;&nbsp;dueDate: YYYY-MM-DD,<br/>
+                    &nbsp;&nbsp;description: string,<br/>
+                    &nbsp;&nbsp;dateAdded: ISO timestamp<br/>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 20
+            }
+        });
+    </script>
+</body>
+</html>

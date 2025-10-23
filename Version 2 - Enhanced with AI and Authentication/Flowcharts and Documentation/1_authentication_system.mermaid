@@ -1,0 +1,86 @@
+graph TB
+    Start([User Opens Website]) --> CheckSession{Check localStorage<br/>for 'user-session'}
+
+    CheckSession -->|Session Exists| ValidateSession{Validate<br/>Session Data}
+    ValidateSession -->|Role = 'student'| RedirectStudent[Redirect to<br/>student_app.html]
+    ValidateSession -->|Role = 'teacher'| RedirectTeacher[Redirect to<br/>teacher_app.html]
+    ValidateSession -->|Invalid| ShowLogin
+
+    CheckSession -->|No Session| ShowLogin[Display Login Page<br/>index.html]
+
+    ShowLogin --> LoginForm[Login Form Display]
+    LoginForm --> UserInput[["User Enters:<br/>- User Type (student/teacher)<br/>- Username<br/>- Password"]]
+
+    UserInput --> SubmitForm[Submit Button Clicked]
+    SubmitForm --> ValidateCredentials{Validate Against<br/>Demo Accounts}
+
+    ValidateCredentials -->|Student Match| CheckStudent{Username = 'student'<br/>AND<br/>Password = 'student123'}
+    ValidateCredentials -->|Teacher Match| CheckTeacher{Username = 'teacher'<br/>AND<br/>Password = 'teacher123'}
+
+    CheckStudent -->|Valid| CreateStudentSession[["CREATE session object:<br/>role = 'student'<br/>username = input<br/>loginTime = now"]]
+    CheckTeacher -->|Valid| CreateTeacherSession[["CREATE session object:<br/>role = 'teacher'<br/>username = input<br/>loginTime = now"]]
+
+    CreateStudentSession --> SaveStudentSession[["SAVE to localStorage<br/>key: 'user-session'<br/>value: JSON session"]]
+    CreateTeacherSession --> SaveTeacherSession[["SAVE to localStorage<br/>key: 'user-session'<br/>value: JSON session"]]
+
+    SaveStudentSession --> RedirectToStudent[Redirect to<br/>student_app.html]
+    SaveTeacherSession --> RedirectToTeacher[Redirect to<br/>teacher_app.html]
+
+    CheckStudent -->|Invalid| ShowError[Display Error Message<br/>❌ 3 seconds]
+    CheckTeacher -->|Invalid| ShowError
+    ValidateCredentials -->|No Match| ShowError
+
+    ShowError --> LoginForm
+
+    RedirectToStudent --> StudentAuth[["Student Portal<br/>checkAuth():<br/>READ 'user-session'<br/>VERIFY role = 'student'"]]
+    RedirectToTeacher --> TeacherAuth[["Teacher Portal<br/>checkAuth():<br/>READ 'user-session'<br/>VERIFY role = 'teacher'"]]
+
+    StudentAuth -->|Valid| StudentPortal[Load Student Portal<br/>Display username]
+    TeacherAuth -->|Valid| TeacherPortal[Load Teacher Portal<br/>Display username]
+
+    StudentAuth -->|Invalid| ForceLogin[Redirect to index.html]
+    TeacherAuth -->|Invalid| ForceLogin
+
+    StudentPortal --> StudentLogout{User Clicks<br/>Logout?}
+    TeacherPortal --> TeacherLogout{User Clicks<br/>Logout?}
+
+    StudentLogout -->|Yes| ConfirmStudent[Confirm Dialog<br/>"Are you sure?"]
+    TeacherLogout -->|Yes| ConfirmTeacher[Confirm Dialog<br/>"Are you sure?"]
+
+    ConfirmStudent -->|Confirmed| RemoveSession1[["REMOVE from localStorage<br/>key: 'user-session'"]]
+    ConfirmTeacher -->|Confirmed| RemoveSession2[["REMOVE from localStorage<br/>key: 'user-session'"]]
+
+    RemoveSession1 --> ForceLogin
+    RemoveSession2 --> ForceLogin
+
+    ForceLogin --> ShowLogin
+
+    StudentLogout -->|No| StudentPortal
+    TeacherLogout -->|No| TeacherPortal
+
+    ConfirmStudent -->|Cancelled| StudentPortal
+    ConfirmTeacher -->|Cancelled| TeacherPortal
+
+    %% Demo Accounts Storage
+    subgraph "Demo Accounts (Hard-coded)"
+        DemoStudent[["Student Account:<br/>username: 'student'<br/>password: 'student123'<br/>role: 'student'"]]
+        DemoTeacher[["Teacher Account:<br/>username: 'teacher'<br/>password: 'teacher123'<br/>role: 'teacher'"]]
+    end
+
+    ValidateCredentials -.->|Compare| DemoStudent
+    ValidateCredentials -.->|Compare| DemoTeacher
+
+    %% Styling
+    classDef auth fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef student fill:#38a169,stroke:#2f855a,color:#fff
+    classDef teacher fill:#e53e3e,stroke:#c53030,color:#fff
+    classDef storage fill:#d69e2e,stroke:#b7791f,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef error fill:#fed7d7,stroke:#c53030,color:#2d3748
+
+    class ShowLogin,LoginForm,UserInput,SubmitForm auth
+    class StudentAuth,StudentPortal,StudentLogout,RedirectToStudent,RedirectStudent student
+    class TeacherAuth,TeacherPortal,TeacherLogout,RedirectToTeacher,RedirectTeacher teacher
+    class CreateStudentSession,CreateTeacherSession,SaveStudentSession,SaveTeacherSession,RemoveSession1,RemoveSession2,DemoStudent,DemoTeacher storage
+    class CheckSession,ValidateSession,ValidateCredentials,CheckStudent,CheckTeacher,ConfirmStudent,ConfirmTeacher decision
+    class ShowError error

@@ -1,0 +1,119 @@
+graph TB
+    Start([Teacher Enters<br/>Assignment Details]) --> GetInput[["GET Input:<br/>- Subject<br/>- Assignment Title<br/>- Desired Due Date"]]
+
+    GetInput --> ParseDate[["parseLocalDate():<br/>Convert date string to<br/>local Date object"]]
+
+    ParseDate --> FilterAssignments[["getFilteredAssignments():<br/>Get only assignments from<br/>teacher's class codes"]]
+
+    FilterAssignments --> CheckDesiredDate[["Count assignments<br/>on desired date"]]
+
+    CheckDesiredDate --> CalculateStress{Calculate<br/>Stress Level}
+
+    CalculateStress -->|Count >= 6| CriticalStress[["Stress Level = 3<br/>CRITICAL"]]
+    CalculateStress -->|Count 4-5| HighStress[["Stress Level = 2<br/>HIGH"]]
+    CalculateStress -->|Count 2-3| ModerateStress[["Stress Level = 1<br/>MODERATE"]]
+    CalculateStress -->|Count 0-1| LowStress[["Stress Level = 0<br/>LOW"]]
+
+    CriticalStress --> GenCritical[["Generate Suggestion:<br/>🚨 CRITICAL RISK<br/>List all conflicting assignments<br/>Warn about performance drop"]]
+    HighStress --> GenHigh[["Generate Suggestion:<br/>⚠️ HIGH RISK<br/>List assignments<br/>25% performance drop warning"]]
+    ModerateStress --> GenModerate[["Generate Suggestion:<br/>ℹ️ MODERATE<br/>Manageable workload"]]
+    LowStress --> GenLow[["Generate Suggestion:<br/>✅ OPTIMAL<br/>Excellent choice"]]
+
+    GenCritical --> CheckWeek
+    GenHigh --> CheckWeek
+    GenModerate --> CheckWeek
+    GenLow --> CheckWeek
+
+    CheckWeek[["Calculate Week Context:<br/>Get week start (Sunday)<br/>Count assignments in week"]]
+
+    CheckWeek --> WeekCheck{Weekly<br/>Assignment Count}
+
+    WeekCheck -->|>= 10| WeekOverload[["Generate Warning:<br/>📊 WEEK OVERLOAD<br/>Exceeds 8-assignment max"]]
+    WeekCheck -->|6-9| WeekHeavy[["Generate Warning:<br/>📈 HEAVY WEEK<br/>Monitor stress levels"]]
+    WeekCheck -->|< 6| WeekOK[Week Load Acceptable]
+
+    WeekOverload --> CheckWeekend
+    WeekHeavy --> CheckWeekend
+    WeekOK --> CheckWeekend
+
+    CheckWeekend{Check Day<br/>of Week}
+
+    CheckWeekend -->|Sunday or Saturday| WeekendWarning[["Generate Warning:<br/>🏖️ WEEKEND ALERT<br/>Affects family time<br/>35-40% lower completion"]]
+    CheckWeekend -->|Weekday| CheckStressForAlternatives
+
+    WeekendWarning --> CheckStressForAlternatives
+
+    CheckStressForAlternatives{Stress Level<br/>>= 1?}
+
+    CheckStressForAlternatives -->|Yes| FindAlternatives[["findOptimalAlternatives():<br/>Search range:<br/>-7 to +21 days"]]
+    CheckStressForAlternatives -->|No| DisplaySuggestions
+
+    FindAlternatives --> LoopDates[["FOR each day in range:<br/>i = -7 to +21<br/>(skip i = 0)"]]
+
+    LoopDates --> AddDaysCalc[["Calculate date:<br/>altDate = addDays(targetDate, i)"]]
+
+    AddDaysCalc --> SkipPast{Date is<br/>in past?}
+
+    SkipPast -->|Yes| NextIteration
+    SkipPast -->|No| ScoreDate[["calculateDateScore():<br/>Start score = 100"]]
+
+    ScoreDate --> ScoreAssignments[["Penalty for existing:<br/>-15 per assignment"]]
+    ScoreAssignments --> ScoreWeekend[["Weekend penalty:<br/>-30 for Sat/Sun<br/>-10 for Friday<br/>-5 for Monday"]]
+    ScoreWeekend --> ScoreWeekLoad[["Week load penalty:<br/>IF week > 8: -20<br/>ELSE IF week > 6: -10"]]
+    ScoreWeekLoad --> ScoreSubject[["Subject clustering penalty:<br/>Find same subject within 3 days<br/>-8 per nearby assignment"]]
+
+    ScoreSubject --> FinalScore[["Final Score:<br/>MAX(0, roundedScore)"]]
+
+    FinalScore --> GoodScore{Score > 60?}
+
+    GoodScore -->|Yes| AddToAlternatives[["ADD to alternatives:<br/>Store date, score,<br/>day name, reason"]]
+    GoodScore -->|No| NextIteration
+
+    AddToAlternatives --> NextIteration[Continue Loop]
+
+    NextIteration --> MoreDates{More dates<br/>to check?}
+
+    MoreDates -->|Yes| LoopDates
+    MoreDates -->|No| SortAlternatives[["SORT alternatives by<br/>score (descending)<br/>TAKE top 3"]]
+
+    SortAlternatives --> GenAltSuggestions[["Generate Suggestions:<br/>⭐ BEST (1st)<br/>💡 GOOD (2nd)<br/>💡 ALTERNATIVE (3rd)"]]
+
+    GenAltSuggestions --> DisplaySuggestions[["Display All Suggestions:<br/>- Main assessment<br/>- Weekly analysis<br/>- Weekend warnings<br/>- AI alternatives<br/>with badges and icons"]]
+
+    DisplaySuggestions --> ShowPanel[Display Suggestions Panel<br/>with color-coded badges]
+
+    ShowPanel --> End([Teacher Reviews<br/>Suggestions])
+
+    %% Scoring Algorithm Details
+    subgraph "Date Scoring Algorithm"
+        ScoreStart[Start: 100 points]
+        ScorePenalties[["Apply Penalties:<br/>- Existing assignments: -15 each<br/>- Weekend (Sat/Sun): -30<br/>- Friday: -10<br/>- Monday: -5<br/>- Week overload (>8): -20<br/>- Week heavy (>6): -10<br/>- Same subject nearby: -8 each"]]
+        ScoreResult[Result: 0-100 score]
+
+        ScoreStart --> ScorePenalties --> ScoreResult
+    end
+
+    %% Reason Generation
+    subgraph "Score Reason Generator"
+        ReasonCheck[["Check conditions:<br/>- No competing assignments<br/>- Only 1 other assignment<br/>- Mid-week timing (Tue-Thu)<br/>- Light week (<= 4)"]]
+        ReasonText[["Generate text:<br/>'No competing assignments,<br/>Mid-week timing,<br/>Light week'"]]
+
+        ReasonCheck --> ReasonText
+    end
+
+    %% Styling
+    classDef input fill:#667eea,stroke:#5a67d8,color:#fff
+    classDef process fill:#38a169,stroke:#2f855a,color:#fff
+    classDef decision fill:#764ba2,stroke:#553c9a,color:#fff
+    classDef critical fill:#fed7d7,stroke:#c53030,color:#2d3748
+    classDef warning fill:#fef7de,stroke:#d69e2e,color:#2d3748
+    classDef success fill:#c6f6d5,stroke:#38a169,color:#2d3748
+    classDef algorithm fill:#e8f4fd,stroke:#667eea,color:#2d3748
+
+    class GetInput,ParseDate input
+    class FilterAssignments,CheckDesiredDate,CheckWeek,FindAlternatives,LoopDates,AddDaysCalc,ScoreDate,ScoreAssignments,ScoreWeekend,ScoreWeekLoad,ScoreSubject,FinalScore,AddToAlternatives,SortAlternatives,GenAltSuggestions process
+    class CalculateStress,WeekCheck,CheckWeekend,CheckStressForAlternatives,SkipPast,GoodScore,MoreDates decision
+    class CriticalStress,GenCritical,WeekOverload critical
+    class HighStress,GenHigh,ModerateStress,GenModerate,WeekHeavy,WeekendWarning warning
+    class LowStress,GenLow,WeekOK success
+    class ScoreStart,ScorePenalties,ScoreResult,ReasonCheck,ReasonText algorithm
